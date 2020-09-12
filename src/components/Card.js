@@ -1,24 +1,29 @@
-import React from 'react';
+import React from 'react'
 import '../styles/card.css'
 import icon from '../images/bulb.svg'
-import {api} from '../services/Api';
+import {api} from '../services/Api'
 
 
 class Card extends React.Component {
-    constructor(ip, name) {
-        super()
-        this.ip = ip
+    constructor(ip, name, props) {
+        super(props)
+        this.ip = '192.168.1.19'
         this.name = name
     }
 
     power = (state) => {
-        api.changeLampState(this.ip, state);
+        api.changeLampState(this.ip, state)
+    }
+
+    handleBulbClick= (event) => {
+        this.power('toggle')
     }
 
     render() {
         return (
             <div>
-                <button onClick={() => this.power('toggle')}>
+                <img src={icon} alt="bulb icon"/>
+                <button onClick={ this.handleBulbClick }>
                     Power Toggle!
                 </button>
             </div>
@@ -27,4 +32,4 @@ class Card extends React.Component {
 }
 
 
-export default Card;
+export default Card

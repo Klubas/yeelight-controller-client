@@ -6,7 +6,7 @@ class Api {
     }
 
     callEndpoint = async (HTTPVerb, endpoint, params = null, data = null, token = null) => {
-        const url = this.rootAddress + endpoint;
+        const url = this.rootAddress + endpoint
         const settings = {
             method: HTTPVerb,
             headers: {
@@ -14,26 +14,26 @@ class Api {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + this.token
             }
-            //,body: JSON.stringify(data)
-        };
+            ,body: JSON.stringify(data)
+        }
         try {
             const fetchResponse = await fetch(url, settings)
             return await fetchResponse.json()
         } catch (e) {
-            await console.log(e)
+            console.log(e)
         }
     }
 
     basicLogin = async (username, password) => {
-        const url = this.rootAddress + '/api/logon';
-        const auth = Buffer.from(username + ':' + password).toString('base64');
+        const url = this.rootAddress + '/api/logon'
+        const auth = Buffer.from(username + ':' + password).toString('base64')
         const settings = {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Authorization': 'Basic ' + auth
             },
-        };
+        }
     
         try {
             const fetchResponse = await fetch(url, settings)
@@ -57,12 +57,12 @@ class Api {
 }
 
 function convertHexToRGB(hexColor) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor);
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor)
     return result ? {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16)
-    } : null;
+    } : null
 }
 
 

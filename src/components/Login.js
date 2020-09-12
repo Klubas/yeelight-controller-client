@@ -1,19 +1,36 @@
-import React from 'react';
+import React from 'react'
 
-import {api} from '../services/Api';
+import {api} from '../services/Api'
 import '../styles/login.css'
 
-/*
-async function auth() {
-    const response = await api.basicLogin('klubas', 'klubaspwd')
-    return await response
-}
-*/
 
 class Login extends React.Component {
-    auth = async () => {
-        const response = await api.basicLogin('klubas', 'klubaspwd')
-        return response 
+    constructor(props) {
+        super(props)
+        this.state = {
+            username: '', 
+            password: ''
+        }
+        this.authenticated = false
+    }
+
+    handleChange = (event) => {
+        let name = event.target.name
+        let val = event.target.value
+        this.setState({[name]: val})
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault()
+
+        const auth = async (username, password) => {
+            const response = await api.basicLogin(username, password)
+            if (await response.status === 'LOGIN_SUCCESS') {
+                this.authenticated = true
+            }
+        }
+
+        auth(this.state.username, this.state.password)
     }
 
     render(){
@@ -22,15 +39,28 @@ class Login extends React.Component {
                 <p><strong>Login</strong></p>
             </div>
             <div>
-                <form className="loginForm">
-                    <label htmlFor="username" className="loginLabel">username</label><br/>
-                    <input type="text" id="username" name="username" className="loginField"/><br/>
-                    <label htmlFor="password" className="loginLabel">password</label><br/>
-                    <input type="password" id="password" name="password" className="loginField"/><br/><br/>
+                <form className="loginForm" onSubmit={ this.handleSubmit }>
+                    <label className="loginLabel">username</label><br/>
+                        <input 
+                            type="text"
+                            name="username"
+                            className="loginField" 
+                            onChange={ this.handleChange } 
+                            value={this.state.username.value}/>
+                        <br/>
+                    <label className="loginLabel">password</label><br/>
+                        <input 
+                            type="password"
+                            name="password"
+                            className="loginField" 
+                            onChange={ this.handleChange } 
+                            value={this.state.password.value}/>
+                        <br/>
+                    <br/>
                     <input type="submit" value="login" hidden={false}/>
                 </form>
             </div>
         </div>
     }
 }
-export default Login;
+export default Login

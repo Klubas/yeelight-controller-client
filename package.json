@@ -9,6 +9,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
+    "react-ui-cards": "^2.0.0",
     "serve": "^11.3.2"
   },
   "scripts": {

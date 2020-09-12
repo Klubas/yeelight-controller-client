@@ -12,13 +12,21 @@ class Api {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + this.token
+                'Authorization': 'Bearer ' + window.localStorage.getItem('access_token')
             }
             ,body: JSON.stringify(data)
         }
+        let response;
         try {
-            const fetchResponse = await fetch(url, settings)
-            return await fetchResponse.json()
+            await fetch(url, settings)
+            .then(response => response.json())
+            .then(jsonData => {
+                response = jsonData.message
+                this.token = response.token
+                return response
+            })
+            console.log(response.description)
+            return response
         } catch (e) {
             console.log(e)
         }
@@ -34,14 +42,20 @@ class Api {
                 'Authorization': 'Basic ' + auth
             },
         }
+        let response;
     
         try {
-            const fetchResponse = await fetch(url, settings)
-            const data = await fetchResponse.json()
-            this.token = await data.message.response
-            return data.message
+            await fetch(url, settings)
+            .then(response => response.json())
+            .then(jsonData => {
+                response = jsonData.message
+                this.token = response.token
+                return response
+            })
+            console.log(response.description)
+            return response
         } catch (e) {
-            await console.log(e)
+            console.log(e)
         }
     }
 

@@ -11,7 +11,6 @@ class Login extends React.Component {
             username: '', 
             password: ''
         }
-        this.authenticated = false
     }
 
     handleChange = (event) => {
@@ -25,11 +24,8 @@ class Login extends React.Component {
 
         const auth = async (username, password) => {
             const response = await api.basicLogin(username, password)
-            if (await response.status === 'LOGIN_SUCCESS') {
-                this.authenticated = true
-            }
+            await window.localStorage.setItem('access_token', response.response);
         }
-
         auth(this.state.username, this.state.password)
     }
 

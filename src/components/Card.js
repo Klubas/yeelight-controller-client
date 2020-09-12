@@ -7,7 +7,7 @@ import {api} from '../services/Api'
 class Card extends React.Component {
     constructor(ip, name, props) {
         super(props)
-        this.ip = '192.168.1.19'
+        this.ip = '192.168.1.13'
         this.name = name
     }
 

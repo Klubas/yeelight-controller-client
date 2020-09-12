@@ -1,26 +1,30 @@
 import React from 'react';
-import logo from '../logo.svg';
-import './App.css';
+import Login from '../components/Login'
+import Card from '../components/Card'
+import {api} from '../services/Api'
+
+import logo from '../images/bulb.svg';
+const currentLocation = window.location.href
+console.log(currentLocation)
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  if (window.localStorage.getItem('access_token')) {
+    return (
+      <div className="App">
+        <div className="App-header">
+          <Card/>
+        </div>
+      </div>
+    )
+  } else {
+    return (
+      <div className="App">
+        <div className="App-header">
+          <Login/>
+        </div>
+      </div>
+    )
+  }
 }
 
 export default App;

@@ -5,25 +5,28 @@ class Api {
         this.token = null
     }
 
-    callEndpoint = async (HTTPVerb, endpoint, params = null, data = null, token = null) => {
+    callEndpoint = async (HTTPVerb, endpoint, data = null) => {
         const url = this.rootAddress + endpoint
         const settings = {
             method: HTTPVerb,
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/html',
                 'Authorization': 'Bearer ' + window.localStorage.getItem('access_token')
             }
-            ,body: JSON.stringify(data)
         }
+
+        if (data){
+            settings.headers['Content-Type'] = 'application/json'
+            settings.body = JSON.stringify(data)
+        }
+
         let response;
         try {
             await fetch(url, settings)
             .then(response => response.json())
             .then(jsonData => {
                 response = jsonData.message
-                this.token = response.token
-                return response
             })
             //console.log(response.description)
             return response
@@ -59,6 +62,14 @@ class Api {
         }
     }
 
+    getAllBulbs = () => {
+        return api.callEndpoint('GET', '/api/bulbs')
+    }
+
+    getBulb = (ip) => {
+        return api.callEndpoint('GET', '/api/bulb?ip=' + ip)
+    }
+
     changeLampState = (ip, state) => {
         return api.callEndpoint('POST', '/api/bulb/power?ip=' + ip + '&state=' + state)
     }
@@ -80,7 +91,7 @@ function convertHexToRGB(hexColor) {
 }
 
 
-export var api = new Api('http://localhost:5000')
+export var api = new Api('http://localhost:5000/')
 
 
 

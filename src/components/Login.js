@@ -37,7 +37,7 @@ class Login extends React.Component {
     }
 
     render(){
-        return <div>
+        return <div className="App-Login">
             <div className="title">
                 <p><strong>Login</strong></p>
             </div>

@@ -2,12 +2,11 @@ import React from 'react';
 import Login from '../components/Login'
 import Logout from '../components/Logout'
 import Card from '../components/Card'
-import {api} from '../services/Api'
 
-import logo from '../images/bulb.svg';
-import { render } from '@testing-library/react';
 const currentLocation = window.location.href
 console.log(currentLocation)
+
+window.addEventListener('storage',e => console.log(e))
 
 class App extends React.Component {
   render() {
@@ -15,7 +14,7 @@ class App extends React.Component {
       return (
         <div className="App">
           <header className="App-header">
-            <Logout/>
+            <Logout/><br/>
           </header>
           <div className="Card-list">
             <Card/>

@@ -25,7 +25,7 @@ class Api {
                 this.token = response.token
                 return response
             })
-            console.log(response.description)
+            //console.log(response.description)
             return response
         } catch (e) {
             console.log(e)
@@ -52,7 +52,7 @@ class Api {
                 this.token = response.token
                 return response
             })
-            console.log(response.description)
+            //console.log(response.description)
             return response
         } catch (e) {
             console.log(e)

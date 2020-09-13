@@ -25,6 +25,13 @@ class Login extends React.Component {
         const auth = async (username, password) => {
             const response = await api.basicLogin(username, password)
             await window.localStorage.setItem('access_token', response.response);
+            console.log(response)
+            if (response.status == 'LOGIN_SUCCESS') {
+                window.location.reload(false)
+            } else {
+                console.log(response.description)
+            }
+
         }
         auth(this.state.username, this.state.password)
     }

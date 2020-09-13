@@ -51,8 +51,9 @@ class Card extends React.Component {
                 <img src={this.state.icon} alt="bulb_icon" onClick={ this.handleBulbClick } /><br/>
                 </div>
                 <div>
-                    <label>{this.ip}</label><br></br>
-                    <label>{this.name}</label>
+                    <label className="bulbIP">{ this.ip }</label><br></br>
+                    <label className="bulbName">{ this.name }</label><br></br>
+                    <label className="bulbModel">{ this.model }</label>
                 </div>
             </div>
         )

@@ -4,31 +4,41 @@ import Logout from '../components/Logout'
 import Card from '../components/Card'
 import {api} from '../services/Api'
 
-
-const currentLocation = window.location.href
-console.log(currentLocation)
-
 window.addEventListener('storage',e => console.log(e))
 
 class App extends React.Component {
   constructor(props){
     super(props)
-    this.state = { data: [], cards: 0 }
-    this.token = window.localStorage.getItem('access_token')
+    this.state = { 
+      data: [], 
+      cards: 0 , 
+      token: props.token
+    }
   }
 
   renderHeader = () => {
     return (
+      <li key="header">
       <header className="App-header">
         <Logout/><br/>
       </header>
+      </li>
+    )
+  }
+
+  renderFooter = () => {
+    return (
+      <li key="footer">
+        <footer className="App-footer">
+          Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+        </footer>
+      </li>
     )
   }
 
   renderCards = () => {
-    console.log(this.state)
     return (
-      <div>
+      <li key="cards">
         <ul className="nobullet">
         {
           this.state.data.map(
@@ -44,7 +54,7 @@ class App extends React.Component {
               </li>)
         }
         </ul>
-      </div>
+      </li>
     )
   }
 
@@ -57,37 +67,43 @@ class App extends React.Component {
   }
 
   componentDidMount = () => {
-    if (this.token){      
+    if (this.state.token){      
       (async () => {
-        const response = await api.getAllBulbs()
-        if (response.status === 'SUCCESS') {
-          await new Promise(accept => this.setState(
-            {
-              data: response.response, 
-              cards: response.response.length
-            }, 
-          accept ))
-        }
+        try {
+          const response = await api.getAllBulbs()
+          if (response && response.status === 'SUCCESS') {
+            await new Promise(accept => this.setState(
+              {
+                data: response.response, 
+                cards: response.response.length
+              }, 
+            accept ))
+          }
+      } catch (e) {
+        console.log(e)
+      }
       })()}
   }
 
   render() {
-    if (this.token) {
-      
-      let renderize = (<div className="App">{ this.renderHeader() }</div>)
-
+    if (this.state.token) {
+      let renderize = []
+      renderize.push(this.renderHeader())
       if (this.state.cards > 0) { 
-        renderize = (
-          <div>
-            {renderize}
-            <div>{this.renderCards()}</div>
-          </div>
-        )
+        renderize.push(this.renderCards())
       }
-
-      return renderize
+      renderize.push(this.renderFooter())
+      
+      return <div className="App">
+        <ul className="nobullet">{renderize}</ul>
+      </div>
     } 
-    return this.renderLogin()
+    return (
+      <div>
+        {this.renderLogin()}
+        {this.renderFooter()}
+      </div>
+    )
   }
 }
 

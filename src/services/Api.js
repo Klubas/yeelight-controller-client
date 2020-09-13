@@ -1,7 +1,6 @@
 class Api {
     constructor(rootAddress) {
         this.rootAddress = rootAddress
-        console.log(rootAddress)
         this.token = null
     }
 
@@ -28,10 +27,9 @@ class Api {
             .then(jsonData => {
                 response = jsonData.message
             })
-            //console.log(response.description)
             return response
-        } catch (e) {
-            console.log(e)
+        } catch (e) {  
+            return null
         }
     }
 
@@ -90,28 +88,4 @@ function convertHexToRGB(hexColor) {
     } : null
 }
 
-
-export var api = new Api('http://localhost:5000/')
-
-
-
-
-/*
-const btnSwitch = document.getElementById('btnSwitch')
-btnSwitch.addEventListener('click',
-	function(){changeLampState(ip='192.168.1.19')}
-)
-
-var colorLightBulb = document.getElementById('colorLightBulb')
-colorLightBulb.addEventListener('change',
-    function(){
-        var newColor = colorLightBulb.value
-        changeLampColor(ip='192.168.1.19', newColor)
-    }
-)
-*/
-
-
-
-
-
+export var api = new Api(process.env.REACT_APP_API_ADDRESS)

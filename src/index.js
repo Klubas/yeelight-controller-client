@@ -5,8 +5,6 @@ import * as serviceWorker from './serviceWorker'
 
 import '../src/styles/index.css'
 
-
-
 ReactDOM.render(
   <React.StrictMode>
     <App token={window.localStorage.getItem('access_token')}/>

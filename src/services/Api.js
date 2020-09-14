@@ -43,8 +43,8 @@ class Api {
                 'Authorization': 'Basic ' + auth
             },
         }
+
         let response;
-    
         try {
             await fetch(url, settings)
             .then(response => response.json())
@@ -53,10 +53,9 @@ class Api {
                 this.token = response.token
                 return response
             })
-            //console.log(response.description)
             return response
         } catch (e) {
-            console.log(e)
+            return 'Não foi possível realizar o login!'
         }
     }
 
@@ -88,4 +87,11 @@ function convertHexToRGB(hexColor) {
     } : null
 }
 
-export var api = new Api(process.env.REACT_APP_API_ADDRESS)
+let api_location
+if (process.env.NODE_ENV === 'production') {
+    api_location = window.location.href
+    api_location = api_location.slice(0, api_location.length-1)
+} else {
+    api_location = process.env.REACT_APP_API_ADDRESS
+}
+export var api = new Api(api_location)

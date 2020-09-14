@@ -78,6 +78,10 @@ class App extends React.Component {
                 cards: response.response.length
               }, 
             accept ))
+          } else if (response === null){
+              console.log(response)
+              window.localStorage.removeItem('access_token')
+              window.location.reload(false)
           }
       } catch (e) {
         console.log(e)

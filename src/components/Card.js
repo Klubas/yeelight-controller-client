@@ -1,64 +1,50 @@
-import React from 'react'
-import '../styles/card.css'
+import React, {useState} from 'react'
 import bulb_on from '../images/bulb_on.svg'
 import bulb_off from '../images/bulb_off.svg'
-import {api} from '../services/Api'
+import {api} from '../utils/Api'
 
-class ColorType extends React.Component {
-    constructor(props) {
-        super(props)
-        this.type = props.type
-    }
-}
 
-class Card extends React.Component {
-    constructor(props) {
-        super(props)
-        this.id = props.id
-        this.ip = props.ip
-        this.name = props.name
-        this.model = props.model
-        this.state = {
-            power: props.power === 'on' ? true : false,
-            color: props.rgb,
-            icon : props.power === 'on' ? bulb_on : bulb_off
+export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, bulbColor }) {
+    const [id, setId] = useState(bulbId);
+    const [ip, setIP] = useState(bulbIP);
+    const [name, setName] = useState(bulbName);
+    const [model, setModel] = useState(bulbModel);
+    const [power, setPower] = useState(bulbPower === 'on' ? true : false);
+    const [color, setColor] = useState(bulbColor);
+    const [icon, setIcon] = useState(bulbPower === 'on' ? bulb_on : bulb_off);
+
+    const handleBulbClick= (event) => {
+
+        const togglePower = (state) => {
+            try {
+                api.changeLampState(this.ip, state)
+                this.setState(
+                    {
+                        power: (state === 'on' ? true : false),
+                        icon: (state === 'on' ? bulb_on : bulb_off)
+                    }
+                )
+            }
+            catch (e){
+                console.log(e)
+            }
         }
+
+        power ? togglePower('off') : togglePower('on')
     }
 
-    power = (state) => {
-        try {
-            api.changeLampState(this.ip, state)
-            this.setState(
-                {
-                    power: (state === 'on' ? true : false),
-                    icon: (state === 'on' ? bulb_on : bulb_off)
-                }
-            )
-        }
-        catch (e){
-            console.log(e)
-        }
-    }
 
-    handleBulbClick= (event) => {
-        this.state.power ? this.power('off') : this.power('on')
-    }
-
-    render() {
-        return (
+    return (
+        <div>
             <div>
-                <div>
-                <img src={this.state.icon} alt="bulb_icon" onClick={ this.handleBulbClick } /><br/>
-                </div>
-                <div>
-                    <label className="bulbIP">{ this.ip }</label><br></br>
-                    <label className="bulbName">{ this.name }</label><br></br>
-                    <label className="bulbModel">{ this.model }</label>
-                </div>
+            <img src={icon} alt="bulb_icon" onClick={ handleBulbClick } /><br/>
             </div>
-        )
-    }
+            <div>
+                <label className="bulbIP">{ ip }</label><br></br>
+                <label className="bulbName">{ name }</label><br></br>
+                <label className="bulbModel">{ model }</label>
+            </div>
+        </div>
+    )
+    
 }
-
-
-export default Card

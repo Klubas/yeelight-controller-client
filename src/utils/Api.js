@@ -1,13 +1,12 @@
 class Api {
     constructor(rootAddress) {
         this.rootAddress = rootAddress
-        this.token = null
     }
 
-    callEndpoint = async (HTTPVerb, endpoint, data = null) => {
+    callEndpoint = async (method, endpoint, data = null) => {
         const url = this.rootAddress + endpoint
         const settings = {
-            method: HTTPVerb,
+            method: method,
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'text/html',
@@ -21,16 +20,22 @@ class Api {
         }
 
         let response;
+        await fetch(url, settings)
+        .then(response => validateResponse(response))
+        .then(jsonData => response = jsonData.message)
+        console.log(response)
+       
         try {
-            await fetch(url, settings)
-            .then(response => response.json())
-            .then(jsonData => {
-                response = jsonData.message
-            })
-            return response
-        } catch (e) {  
-            return null
-        }
+            if (response.status === 'SUCCESS') {
+                return response
+            } else {
+                throw new Error (response.description)
+            } 
+
+        } catch (error) {
+            console.log(error)
+            throw new Error('Unexpected error')
+        }    
     }
 
     basicLogin = async (username, password) => {
@@ -45,17 +50,20 @@ class Api {
         }
 
         let response;
+
+        await fetch(url, settings)
+            .then(response => validateResponse(response))
+            .then(jsonData => response = jsonData.message
+        )
         try {
-            await fetch(url, settings)
-            .then(response => response.json())
-            .then(jsonData => {
-                response = jsonData.message
-                this.token = response.token
-                return response
-            })
-            return response
-        } catch (e) {
-            return 'Não foi possível realizar o login!'
+            if (response.status === 'LOGIN_SUCCESS') {
+                window.localStorage.setItem('access_token', response.response)
+                return response.description
+            } else {
+                throw new Error (response.description)
+            } 
+        } catch (error) {
+            throw new Error ('Unexpected error')
         }
     }
 
@@ -78,6 +86,23 @@ class Api {
     }
 }
 
+const validateResponse = (response) => {
+    const [status, statusText] = [response.status, response.statusText]
+    try {
+        if (response && response.status !== 401) {
+            return response.json()
+        } else if (status === 401) {
+            window.localStorage.removeItem('access_token')
+            throw new Error('Expired credentials')
+        } else {
+            throw new Error('Unexpected error')
+        }
+    } catch (error) {
+        console.log(error)
+        throw new Error(error.message)
+    }
+}
+
 function convertHexToRGB(hexColor) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor)
     return result ? {
@@ -87,11 +112,6 @@ function convertHexToRGB(hexColor) {
     } : null
 }
 
-let api_location
-if (process.env.NODE_ENV === 'production') {
-    api_location = window.location.href
-    api_location = api_location.slice(0, api_location.length-1)
-} else {
-    api_location = process.env.REACT_APP_API_ADDRESS
-}
-export var api = new Api(api_location)
+let api_address = process.env.REACT_APP_API_ADDRESS ? process.env.REACT_APP_API_ADDRESS : window.location.href
+export var api = new Api(api_address)
+console.log(api_address)

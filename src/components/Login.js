@@ -1,78 +1,141 @@
-import React from 'react'
+import React, { useState } from 'react';
 
-import {api} from '../services/Api'
-import '../styles/login.css'
+import {
+  Flex,
+  Box,
+  Heading,
+  FormControl,
+  FormLabel,
+  Input,
+  Button,
+  CircularProgress,
+  Text,
+  InputGroup,
+  InputRightElement,
+  Icon
+} from '@chakra-ui/core';
 
+import {api} from '../utils/Api'
+import CardList from './CardList'
+import ErrorMessage from './ErrorMessage';
 
-class Login extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            username: '', 
-            password: '',
-            logged: false
-        }
+export default function Login({ access_token }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(access_token ? true : false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = async event => {
+    event.preventDefault();
+
+    setIsLoading(true);
+
+    try {
+        await api.basicLogin(email, password)
+        setIsLoggedIn(true);
+        setIsLoading(false);
+        setShowPassword(false);
+    } catch (error) {
+        setError(error.message);
+        setIsLoading(false);
+        setEmail('');
+        setPassword('');
+        setShowPassword(false);
     }
+  };
 
-    auth = async (username, password) => {
-        const response = await api.basicLogin(username, password)
-        try {
-            if (response && response.status === 'LOGIN_SUCCESS') {
-                await window.localStorage.setItem('access_token', response.response);
-                this.setState({logged: true})
-                window.location.reload(false)
-            } else {
-                window.alert(response)
-            }
-        } catch (e) {
-            window.alert(response)
-        }
+  const handlePasswordVisibility = () => setShowPassword(!showPassword);
 
-    }
-
-    handleChange = (event) => {
-        let name = event.target.name
-        let val = event.target.value
-        this.setState({[name]: val})
-    }
-
-    handleSubmit = (event) => {
-        event.preventDefault()
-        this.auth(this.state.username, this.state.password)
-    }
-
-    render(){
-        if (! this.state.logged) {
-            return <div className="App-Login">
-                <div className="title">
-                    <p><strong>Login</strong></p>
-                </div>
-                <div>
-                    <form className="loginForm" onSubmit={ this.handleSubmit }>
-                        <label className="loginLabel">username</label><br/>
-                            <input 
-                                type="text"
-                                name="username"
-                                className="loginField" 
-                                onChange={ this.handleChange } 
-                                value={this.state.username.value}/>
-                            <br/>
-                        <label className="loginLabel">password</label><br/>
-                            <input 
-                                type="password"
-                                name="password"
-                                className="loginField" 
-                                onChange={ this.handleChange } 
-                                value={this.state.password.value}/>
-                            <br/>
-                        <br/>
-                        <input type="submit" value="login" hidden={false}/>
-                    </form>
-                </div>
-            </div>
-        } else { 
-            return null 
-        }
-    }
+  return (
+    <Flex width="full" align="center" justifyContent="center">
+      <Box
+        p={8}
+        maxWidth="500px"
+        borderWidth={1}
+        borderRadius={8}
+        boxShadow="lg"
+      >
+        {isLoggedIn ? (
+          <Box textAlign="center">
+            <CardList/>
+            <Button
+              variantColor="orange"
+              variant="outline"
+              width="full"
+              mt={4}
+              onClick={() => {
+                window.localStorage.removeItem('access_token')
+                setIsLoggedIn(false)
+              }}
+            >
+              Sign out
+            </Button>
+          </Box>
+        ) : (
+          <>
+            <Box textAlign="center">
+              <Heading>Login</Heading>
+            </Box>
+            <Box my={4} textAlign="left">
+              <form onSubmit={handleSubmit}>
+                {error && <ErrorMessage message={error} />}
+                <FormControl isRequired>
+                  <FormLabel>Email</FormLabel>
+                  <Input
+                    type="text"
+                    placeholder="test@test.com"
+                    size="lg"
+                    onChange={event => setEmail(event.currentTarget.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired mt={6}>
+                  <FormLabel>Password</FormLabel>
+                  <InputGroup>
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="*******"
+                      size="lg"
+                      onChange={event => setPassword(event.currentTarget.value)}
+                    />
+                    <InputRightElement width="3rem">
+                      <Button
+                        h="1.5rem"
+                        size="sm"
+                        onClick={handlePasswordVisibility}
+                      >
+                        {showPassword ? (
+                          <Icon name="view-off" />
+                        ) : (
+                          <Icon name="view" />
+                        )}
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+                </FormControl>
+                <Button
+                  variantColor="teal"
+                  variant="outline"
+                  type="submit"
+                  width="full"
+                  mt={4}
+                >
+                  {isLoading ? (
+                    <CircularProgress
+                      isIndeterminate
+                      size="24px"
+                      color="teal"
+                    />
+                  ) : (
+                    'Sign In'
+                  )}
+                </Button>
+              </form>
+            </Box>
+          </>
+        )}
+      </Box>
+    </Flex>
+  );
 }
-export default Login

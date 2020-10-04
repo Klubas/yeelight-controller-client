@@ -62,8 +62,8 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
         <Flex 
             align="left" 
             p={5}
-            minWidth="300px"
-            maxWidth="300px"
+            minWidth="350px"
+            maxWidth="350px"
             minHeight="190px"
             maxHeight="190px"
             borderWidth={1}
@@ -82,7 +82,7 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
                     <Flex width="full" textAlign="left" verticalAlign="center">
                         <Heading>
                             <Editable 
-                                maxWidth="170px"
+                                maxWidth="200px"
                                 defaultValue={ name }
                                 selectAllOnFocus={true} 
                                 onSubmit={ handleSubmit }
@@ -99,7 +99,7 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
                         <Badge verticalAlign="sub">{model}</Badge>
                     </Box>
                 </Box>
-                {error && <ErrorMessage message={error} />}
+                {error && <ErrorMessage message={error} />/* todo: fazer um toast para exibir esse erro */} 
             </Box>
         </Flex>
     )

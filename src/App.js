@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react'
 import Login from './components/Login'
 
 import {
@@ -10,22 +10,10 @@ import {
   Flex,
   Link,
   Icon
-} from '@chakra-ui/core';
+} from '@chakra-ui/core'
 
-import ThemeToggler from './components/ThemeToggler';
+export default function App ({ access_token }) {
 
-const App = ({ access_token }) => {
-
-  const Header = () => (
-      <header className="App-header">
-        <Flex width="full" align="center" justify="right">
-          <Box>
-            <ThemeToggler />
-          </Box>
-        </Flex>
-      </header>
-  )
-  
   const Footer = () => (
       <footer className="App-footer">
         <Flex width="full" align="center" justifyContent="center">
@@ -51,12 +39,9 @@ const App = ({ access_token }) => {
       <ThemeProvider theme={theme}>
         <CSSReset />
         <ColorModeProvider>
-          <Header/>
-            <Login access_token={access_token}/>
+          <Login access_token={access_token}/>
           <Footer/>
         </ColorModeProvider>
       </ThemeProvider>
     ) 
 }
-
-export default App;

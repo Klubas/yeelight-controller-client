@@ -1,48 +1,69 @@
 import React, { useState, useEffect } from 'react'
-import { Flex, Box, CircularProgress,  List, ListItem, ListIcon} from "@chakra-ui/core";
+import { 
+    Flex, 
+    Box, 
+    List, 
+    ListItem, 
+    Skeleton,
+} from "@chakra-ui/core"
 
 import Card from '../components/Card'
 import {api} from '../utils/Api'
 
-import ErrorMessage from './ErrorMessage';
+import ErrorMessage from './ErrorMessage'
 
 
 export default function CardList ({data}) {
-    const [cardData, setCardData] = useState([]);
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [cardData, setCardData] = useState([])
+    const [error, setError] = useState('')
 
-    useEffect(() => {
-        async function fetchData() {
+    useEffect(() => {fetchData()}, [])
+
+    async function fetchData() {
             
-            setIsLoading(true)
-
-            try {
-                const response = await api.getAllBulbs()
-                setCardData(response.response)
-                setIsLoading(false);
-            } catch (error) {
-                setIsLoading(false);
-                setError(error.message)
-                console.log(error)
+        try {
+            let response = await api.getAllBulbs()
+            response = response.response
+            if (response.length > 0) {
+                setCardData(response)
+                setError('')
+            } else {
+                throw new Error('No bulbs found!')
             }
+        } catch (error) {
+            setError(error.message)
+            console.log(error)
         }
-        fetchData()
-    }, [cardData])
+    }
 
-    return ( ! cardData.length ? 
-        (
-            <> 
-            { error 
-                    ? <ErrorMessage message={error}/> 
-                    : <CircularProgress
-                    isIndeterminate
-                    size="24px"
-                    color="yellow"
-                    />
-            } 
-            </>
-        ) : (
+    const Loading = () => {
+        return (
+            error 
+                ? (<>
+                    <Box 
+                        minWidth="350px"
+                        maxWidth="350px"
+                        minHeight="190px"
+                        maxHeight="190px"
+                    >
+                        <ErrorMessage message={error}/> 
+                    </Box>
+                </>) : (<>
+                    <Box>
+                        <Skeleton isLoaded={false}
+                            borderRadius={8}
+                            minWidth="350px"
+                            maxWidth="350px"
+                            minHeight="190px"
+                            maxHeight="190px" 
+                        />
+                    </Box>
+                </>)    
+        )
+    }
+
+    const Bulbs = () => {
+        return (
             <Flex>
                 <List as="ul">
                 {cardData.map(
@@ -58,7 +79,15 @@ export default function CardList ({data}) {
                         />
                     </ListItem>
                 )}
-            </List>
-        </Flex>
-    ))
+                </List>
+            </Flex>
+        )
+    }
+
+    return (<>
+        {! cardData.length 
+            ? ( <Loading/> )
+            : ( <Bulbs/>)
+        }
+    </>)
 }

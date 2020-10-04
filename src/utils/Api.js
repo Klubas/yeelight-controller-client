@@ -19,7 +19,7 @@ class Api {
             settings.body = JSON.stringify(data)
         }
 
-        let response;
+        let response
         await fetch(url, settings)
         .then(response => validateResponse(response))
         .then(jsonData => response = jsonData.message)
@@ -48,7 +48,7 @@ class Api {
             },
         }
 
-        let response;
+        let response
 
         await fetch(url, settings)
             .then(response => validateResponse(response))
@@ -67,7 +67,11 @@ class Api {
     }
 
     getAllBulbs = () => {
-        return api.callEndpoint('GET', '/api/bulbs')
+        let fake_bulbs = (process.env.REACT_APP_FAKE_BULBS 
+                            ? '?fake_bulbs=' + process.env.REACT_APP_FAKE_BULBS 
+                            : '')
+        
+        return api.callEndpoint('GET', '/api/bulbs' + fake_bulbs)
     }
 
     getBulb = (ip) => {

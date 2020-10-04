@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 import {
   Flex,
@@ -11,20 +11,24 @@ import {
   CircularProgress,
   InputGroup,
   InputRightElement,
-  Icon
-} from '@chakra-ui/core';
+  Icon,
+  useToast,
+  IconButton
+} from '@chakra-ui/core'
+import ThemeToggler from '../components/ThemeToggler'
 
 import {api} from '../utils/Api'
 import CardList from './CardList'
-import ErrorMessage from './ErrorMessage';
+import ErrorMessage from './ErrorMessage'
 
 export default function Login({ access_token }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(access_token ? true : false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(access_token ? true : false)
+  const [showPassword, setShowPassword] = useState(false)
+  const toast = useToast()
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -36,6 +40,12 @@ export default function Login({ access_token }) {
         setIsLoggedIn(true)
         setIsLoading(false)
         setShowPassword(false)
+        toast({
+          title: "Welcome to YeelightHub",
+          status: "success",
+          duration: 1500,
+          isClosable: true,
+      })
     } catch (error) {
         setError(error.message)
         setIsLoading(false)
@@ -43,36 +53,66 @@ export default function Login({ access_token }) {
         setPassword('')
         setShowPassword(false)
     }
-  };
+  }
 
-  const handlePasswordVisibility = () => setShowPassword(!showPassword);
+  const Header = () => (
+    <header className="App-header">
+      <Flex width="full" align="center" justify="right">
+          <ThemeToggler />
+          <Box textAlign="right" py={4} mr={12}>
+            <IconButton 
+                size="lg"
+                icon="repeat" 
+                variant="ghost" 
+                verticalAlign="top"
+                onClick={
+                  () => {
+                    window.location.reload()
+                  }
+                }
+            />
+          </Box>
+          {isLoggedIn 
+            ? (
+              <Box textAlign="right" py={4} mr={12}>
+                <IconButton 
+                  size="lg"
+                  icon="small-close" 
+                  variant="ghost" 
+                  verticalAlign="top"
+                  onClick={
+                    () => {
+                      window.localStorage.removeItem('access_token')
+                      setIsLoggedIn(false)
+                    }
+                  }
+                />
+              </Box>
+            ) 
+            : null
+          }
+          
+      </Flex>
+    </header>
+)
+
+  const handlePasswordVisibility = () => setShowPassword(!showPassword)
 
   return (
+    <> <Header/>
     <Flex width="full" align="center" justifyContent="center">
       <Box
         p={8}
         maxWidth="500px"
+        minWidth="400px"
         borderWidth={1}
         borderRadius={8}
         boxShadow="lg"
+        alignContent="center"
       >
         {isLoggedIn ? (
           <Box textAlign="center">
-            <Box>
               <CardList/>
-            </Box>
-            <Button
-              variantColor="orange"
-              variant="outline"
-              maxWidth="50"
-              mt={4}
-              onClick={() => {
-                window.localStorage.removeItem('access_token')
-                setIsLoggedIn(false)
-              }}
-            >
-              Log out
-            </Button>
           </Box>
         ) : (
           <>
@@ -138,5 +178,6 @@ export default function Login({ access_token }) {
         )}
       </Box>
     </Flex>
-  );
+    </>
+  )
 }

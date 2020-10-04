@@ -3,8 +3,6 @@ import {
     Flex, 
     Box, 
     Grid,
-    List, 
-    ListItem, 
     Skeleton,
 } from "@chakra-ui/core"
 

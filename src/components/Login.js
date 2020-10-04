@@ -142,12 +142,13 @@ export default function Login({ access_token }) {
                       <Button
                         h="1.5rem"
                         size="sm"
+                        variant="ghost"
                         onClick={handlePasswordVisibility}
                       >
                         {showPassword ? (
-                          <Icon name="view-off" />
+                          <Icon name="view-off"/>
                         ) : (
-                          <Icon name="view" />
+                          <Icon name="view"/>
                         )}
                       </Button>
                     </InputRightElement>

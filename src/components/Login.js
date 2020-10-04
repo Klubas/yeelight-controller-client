@@ -9,7 +9,6 @@ import {
   Input,
   Button,
   CircularProgress,
-  Text,
   InputGroup,
   InputRightElement,
   Icon
@@ -27,22 +26,22 @@ export default function Login({ access_token }) {
   const [isLoggedIn, setIsLoggedIn] = useState(access_token ? true : false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async event => {
-    event.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault()
 
-    setIsLoading(true);
+    setIsLoading(true)
 
     try {
         await api.basicLogin(email, password)
-        setIsLoggedIn(true);
-        setIsLoading(false);
-        setShowPassword(false);
+        setIsLoggedIn(true)
+        setIsLoading(false)
+        setShowPassword(false)
     } catch (error) {
-        setError(error.message);
-        setIsLoading(false);
-        setEmail('');
-        setPassword('');
-        setShowPassword(false);
+        setError(error.message)
+        setIsLoading(false)
+        setEmail('')
+        setPassword('')
+        setShowPassword(false)
     }
   };
 
@@ -59,11 +58,13 @@ export default function Login({ access_token }) {
       >
         {isLoggedIn ? (
           <Box textAlign="center">
-            <CardList/>
+            <Box>
+              <CardList/>
+            </Box>
             <Button
               variantColor="orange"
               variant="outline"
-              width="full"
+              maxWidth="50"
               mt={4}
               onClick={() => {
                 window.localStorage.removeItem('access_token')
@@ -75,7 +76,7 @@ export default function Login({ access_token }) {
           </Box>
         ) : (
           <>
-            <Box textAlign="center">
+            <Box textAlign="left">
               <Heading>Login</Heading>
             </Box>
             <Box my={4} textAlign="left">
@@ -115,7 +116,7 @@ export default function Login({ access_token }) {
                   </InputGroup>
                 </FormControl>
                 <Button
-                  variantColor="teal"
+                  variantColor="yellow"
                   variant="outline"
                   type="submit"
                   width="full"
@@ -125,7 +126,7 @@ export default function Login({ access_token }) {
                     <CircularProgress
                       isIndeterminate
                       size="24px"
-                      color="teal"
+                      color="yellow"
                     />
                   ) : (
                     'Sign In'

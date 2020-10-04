@@ -23,7 +23,6 @@ class Api {
         await fetch(url, settings)
         .then(response => validateResponse(response))
         .then(jsonData => response = jsonData.message)
-        console.log(response)
        
         try {
             if (response.status === 'SUCCESS') {
@@ -84,6 +83,10 @@ class Api {
         const color = rgbColor.r.toString().concat(" ", rgbColor.g.toString(), " ", rgbColor.b.toString())
         return api.callEndpoint('color', color)
     }
+
+    changeLampName = (ip, newName) => {
+        return api.callEndpoint('PUT', '/api/bulb?ip=' + ip + '&new_name=' + newName)
+    }
 }
 
 const validateResponse = (response) => {
@@ -95,7 +98,7 @@ const validateResponse = (response) => {
             window.localStorage.removeItem('access_token')
             throw new Error('Expired credentials')
         } else {
-            throw new Error('Unexpected error')
+            throw new Error('Unexpected error ' + statusText)
         }
     } catch (error) {
         console.log(error)

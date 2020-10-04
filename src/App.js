@@ -5,46 +5,57 @@ import {
   ThemeProvider,
   theme,
   ColorModeProvider,
-  CSSReset
+  CSSReset,
+  Box,
+  Flex,
+  Link,
+  Icon
 } from '@chakra-ui/core';
 
 import ThemeToggler from './components/ThemeToggler';
 
 const App = ({ access_token }) => {
-  const [token, setToken] = useState(access_token)
 
   const Header = () => (
       <header className="App-header">
-        <ThemeToggler />
+        <Flex width="full" align="center" justify="right">
+          <Box>
+            <ThemeToggler />
+          </Box>
+        </Flex>
       </header>
   )
   
   const Footer = () => (
       <footer className="App-footer">
-        Icons made by&nbsp;
-        <a 
-          href="https://www.flaticon.com/authors/freepik" 
-          title="Freepik">Freepik&nbsp;
-        </a> 
-        from&nbsp;
-        <a 
-          href="https://www.flaticon.com/" 
-          title="Flaticon">www.flaticon.com&nbsp;
-        </a>
+        <Flex width="full" align="center" justifyContent="center">
+          <Box
+            p={70}
+            borderWidth={0}
+            borderRadius={0}
+          >
+            Icons made by&nbsp;
+            <Link href="https://www.flaticon.com/authors/freepik" title="Freepik" isExternal>
+              Freepik&nbsp;
+            </Link> 
+            from&nbsp;
+            <Link href="https://www.flaticon.com/" title="Flaticon" isExternal>
+                www.flaticon.com <Icon name="external-link" mx="2px" />&nbsp;
+            </Link>
+          </Box>
+        </Flex>
       </footer>
   )
 
   return (
-    <div>
       <ThemeProvider theme={theme}>
         <CSSReset />
         <ColorModeProvider>
           <Header/>
-            <Login access_token={token}/>
+            <Login access_token={access_token}/>
           <Footer/>
         </ColorModeProvider>
       </ThemeProvider>
-    </div>
     ) 
 }
 

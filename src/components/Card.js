@@ -82,10 +82,12 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
                     <Flex width="full" textAlign="left" verticalAlign="center">
                         <Heading>
                             <Editable 
-                                defaultValue={name} 
+                                maxWidth="170px"
+                                defaultValue={ name }
                                 selectAllOnFocus={true} 
                                 onSubmit={ handleSubmit }
                                 onChange={eventValue => setNewName(eventValue)}
+                                isTruncated
                             >
                                 <EditablePreview />
                                 <EditableInput />

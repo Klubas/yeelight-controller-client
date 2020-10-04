@@ -28,7 +28,7 @@ export default function CardList ({data}) {
             }
         }
         fetchData()
-    }, [])
+    }, [cardData])
 
     return ( ! cardData.length ? 
         (

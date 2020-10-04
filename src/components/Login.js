@@ -71,7 +71,7 @@ export default function Login({ access_token }) {
                 setIsLoggedIn(false)
               }}
             >
-              Sign out
+              Log out
             </Button>
           </Box>
         ) : (
@@ -129,7 +129,7 @@ export default function Login({ access_token }) {
                       color="yellow"
                     />
                   ) : (
-                    'Sign In'
+                    'Log In'
                   )}
                 </Button>
               </form>

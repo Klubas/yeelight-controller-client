@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { 
     Flex, 
     Box, 
+    Grid,
     List, 
     ListItem, 
     Skeleton,
@@ -65,10 +66,9 @@ export default function CardList ({data}) {
     const Bulbs = () => {
         return (
             <Flex>
-                <List as="ul">
-                {cardData.map(
-                    (item) => 
-                    <ListItem key={item.id} >
+                <Grid gap="6">
+                {cardData.map((item) => 
+                    <Box key={item.id} >
                         <Card 
                             bulbId={item.id}
                             bulbIP={item.ip} 
@@ -77,9 +77,9 @@ export default function CardList ({data}) {
                             bulbPower={item.properties.power}
                             bulbColor={item.properties.rgb}
                         />
-                    </ListItem>
+                    </Box>
                 )}
-                </List>
+                </Grid>
             </Flex>
         )
     }

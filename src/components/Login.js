@@ -103,12 +103,10 @@ export default function Login({ access_token }) {
     <Flex width="full" align="center" justifyContent="center">
       <Box
         p={8}
-        maxWidth="500px"
-        minWidth="400px"
         borderWidth={1}
         borderRadius={8}
         boxShadow="lg"
-        alignContent="center"
+        justifyContent="center"
       >
         {isLoggedIn ? (
           <Box textAlign="center">

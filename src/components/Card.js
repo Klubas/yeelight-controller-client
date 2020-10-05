@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/core"
 
 
-export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, bulbColor }) {
+export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, bulbColor, cardWidth, cardHeight}) {
     const toast = useToast()
     const [id, setId] = useState(bulbId)
     const [ip, setIP] = useState(bulbIP)
@@ -102,10 +102,10 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
         <Flex 
             align="left" 
             p={5}
-            minWidth="350px"
-            maxWidth="350px"
-            minHeight="190px"
-            maxHeight="190px"
+            minWidth={cardWidth}
+            maxWidth={cardWidth}
+            minHeight={cardHeight}
+            maxHeight={cardHeight}
             borderWidth={1}
             borderRadius={8}
             boxShadow="lg"
@@ -128,9 +128,10 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
                         
                 </Box>
                 <Box>
-                    <Flex height="full" width="full" textAlign="left" verticalAlign="center">
+                    <Flex textAlign="left" verticalAlign="center">
                         <Heading>
-                            <Editable 
+                            <Editable
+                                minWidth="150px"
                                 maxWidth="200px"
                                 value={ newName } 
                                 defaultValue={ newName }

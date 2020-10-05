@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import ReactDOM from 'react-dom'
+import React, { useState} from 'react'
 
 import {
   Flex,
@@ -57,9 +58,11 @@ export default function Login({ access_token }) {
 
   const Header = () => (
     <header className="App-header">
-      <Flex width="full" align="center" justify="right">
-          <ThemeToggler />
-          <Box textAlign="right" py={4} mr={12}>
+      <Flex width="100%" justify="center">
+          <Box textAlign="center" p={5} >
+            <ThemeToggler />
+          </Box>
+          <Box textAlign="center" p={5} >
             <IconButton 
                 size="lg"
                 icon="repeat" 
@@ -74,7 +77,7 @@ export default function Login({ access_token }) {
           </Box>
           {isLoggedIn 
             ? (
-              <Box textAlign="right" py={4} mr={12}>
+              <Box textAlign="center" p={5} >
                 <IconButton 
                   size="lg"
                   icon="small-close" 
@@ -100,12 +103,14 @@ export default function Login({ access_token }) {
 
   return (
     <> <Header/>
-    <Flex width="full" align="center" justifyContent="center">
+    <Flex width="full" justify="center">
       <Box
-        p={8}
+        p={3}
         borderWidth={1}
         borderRadius={8}
         boxShadow="lg"
+        minWidth="340px"
+        maxWidth="100%"
         justifyContent="center"
       >
         {isLoggedIn ? (

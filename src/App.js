@@ -24,7 +24,7 @@ export default function App ({ access_token }) {
           >
             Icons made by&nbsp;
             <Link href="https://www.flaticon.com/authors/freepik" title="Freepik" isExternal>
-              Freepik&nbsp;
+              Freepik<br></br>
             </Link> 
             from&nbsp;
             <Link href="https://www.flaticon.com/" title="Flaticon" isExternal>

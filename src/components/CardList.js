@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { 
-    Flex, 
     Box, 
     Grid,
     Skeleton,
@@ -8,18 +7,20 @@ import {
 
 import Card from '../components/Card'
 import {api} from '../utils/Api'
-
 import ErrorMessage from './ErrorMessage'
 
-
-export default function CardList ({data}) {
+export default function CardList () {
     const [cardData, setCardData] = useState([])
     const [error, setError] = useState('')
+    const cardHeight = "190px"
+    const cardWidth = "330px"
 
-    useEffect(() => {fetchData()}, [])
+    useEffect(() => {
+        fetchData()
+    }, [])
 
-    async function fetchData() {
-            
+    const fetchData = async () => {
+
         try {
             let response = await api.getAllBulbs()
             response = response.response
@@ -40,33 +41,40 @@ export default function CardList ({data}) {
             error 
                 ? (<>
                     <Box 
-                        minWidth="350px"
-                        maxWidth="350px"
-                        minHeight="190px"
-                        maxHeight="190px"
+                        borderRadius={8}
+                        minWidth={cardWidth}
+                        maxWidth={cardWidth}
+                        minHeight={cardHeight}
+                        maxHeight={cardHeight}
                     >
                         <ErrorMessage message={error}/> 
                     </Box>
                 </>) : (<>
-                    <Box>
+                    <Grid gap="6">
                         <Skeleton isLoaded={false}
                             borderRadius={8}
-                            minWidth="350px"
-                            maxWidth="350px"
-                            minHeight="190px"
-                            maxHeight="190px" 
+                            maxWidth={cardWidth}
+                            minWidth={cardWidth}
+                            minHeight={cardHeight}
+                            maxHeight={cardHeight}
                         />
-                    </Box>
+                        <Skeleton isLoaded={false}
+                            borderRadius={8}
+                            maxWidth={cardWidth}
+                            minWidth={cardWidth}
+                            minHeight={cardHeight}
+                            maxHeight={cardHeight}
+                        />
+                    </Grid>
                 </>)    
         )
     }
 
     const Bulbs = () => {
         return (
-            <Flex>
                 <Grid gap="6">
                 {cardData.map((item) => 
-                    <Box key={item.id} >
+                    <Box key={item.id} maxWidth="100%">
                         <Card 
                             bulbId={item.id}
                             bulbIP={item.ip} 
@@ -74,16 +82,17 @@ export default function CardList ({data}) {
                             bulbModel={item.model}
                             bulbPower={item.properties.power}
                             bulbColor={item.properties.rgb}
+                            cardHeight={cardHeight}
+                            cardWidth={cardWidth}
                         />
                     </Box>
                 )}
                 </Grid>
-            </Flex>
         )
     }
 
     return (<>
-        {! cardData.length 
+        { ! cardData.length
             ? ( <Loading/> )
             : ( <Bulbs/>)
         }

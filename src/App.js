@@ -18,7 +18,7 @@ export default function App ({ access_token }) {
       <footer className="App-footer">
         <Flex width="full" align="center" justifyContent="center">
           <Box
-            p={70}
+            p="20px"
             borderWidth={0}
             borderRadius={0}
           >

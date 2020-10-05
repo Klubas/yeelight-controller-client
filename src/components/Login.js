@@ -75,9 +75,8 @@ export default function Login({ access_token }) {
                 }
             />
           </Box>
-          {isLoggedIn 
-            ? (
-              <Box textAlign="center" p={5} >
+              <Box textAlign="center" p={5} 
+                    visibility={isLoggedIn ? "visible" : "hidden"}>
                 <IconButton 
                   size="lg"
                   icon="small-close" 
@@ -89,11 +88,10 @@ export default function Login({ access_token }) {
                       setIsLoggedIn(false)
                     }
                   }
+                  
                 />
               </Box>
-            ) 
-            : null
-          }
+          
           
       </Flex>
     </header>

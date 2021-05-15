@@ -1,4 +1,3 @@
-import ReactDOM from 'react-dom'
 import React, { useState} from 'react'
 
 import {
@@ -13,24 +12,23 @@ import {
   InputGroup,
   InputRightElement,
   Icon,
-  useToast,
-  IconButton
+  useToast
 } from '@chakra-ui/core'
-import ThemeToggler from '../components/ThemeToggler'
 
 import {api} from '../utils/Api'
 import CardList from './CardList'
 import ErrorMessage from './ErrorMessage'
 
-export default function Login({ access_token }) {
+export default function Login({ access_token, appLayout }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(access_token ? true : false)
   const [showPassword, setShowPassword] = useState(false)
+  const [layout, setLayout] = useState(appLayout)
   const toast = useToast()
-
+  
   const handleSubmit = async (event) => {
     event.preventDefault()
 
@@ -46,7 +44,7 @@ export default function Login({ access_token }) {
           status: "success",
           duration: 1500,
           isClosable: true,
-      })
+        })
     } catch (error) {
         setError(error.message)
         setIsLoading(false)
@@ -56,51 +54,10 @@ export default function Login({ access_token }) {
     }
   }
 
-  const Header = () => (
-    <header className="App-header">
-      <Flex width="100%" justify="center">
-          <Box textAlign="center" p={5} >
-            <ThemeToggler />
-          </Box>
-          <Box textAlign="center" p={5} >
-            <IconButton 
-                size="lg"
-                icon="repeat" 
-                variant="ghost" 
-                verticalAlign="top"
-                onClick={
-                  () => {
-                    window.location.reload()
-                  }
-                }
-            />
-          </Box>
-              <Box textAlign="center" p={5} 
-                    visibility={isLoggedIn ? "visible" : "hidden"}>
-                <IconButton 
-                  size="lg"
-                  icon="small-close" 
-                  variant="ghost" 
-                  verticalAlign="top"
-                  onClick={
-                    () => {
-                      window.localStorage.removeItem('access_token')
-                      setIsLoggedIn(false)
-                    }
-                  }
-                  
-                />
-              </Box>
-          
-          
-      </Flex>
-    </header>
-)
-
   const handlePasswordVisibility = () => setShowPassword(!showPassword)
 
   return (
-    <> <Header/>
+    <>
     <Flex width="full" justify="center">
       <Box
         p={3}
@@ -113,7 +70,7 @@ export default function Login({ access_token }) {
       >
         {isLoggedIn ? (
           <Box textAlign="center">
-              <CardList/>
+              <CardList appLayout={layout}/>
           </Box>
         ) : (
           <>

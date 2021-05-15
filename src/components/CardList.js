@@ -7,13 +7,18 @@ import {
 
 import Card from '../components/Card'
 import {api} from '../utils/Api'
+import {client_env} from '../utils/Environment'
 import ErrorMessage from './ErrorMessage'
 
-export default function CardList () {
+
+
+export default function CardList ({ appLayout }) {
     const [cardData, setCardData] = useState([])
     const [error, setError] = useState('')
-    const cardHeight = "190px"
-    const cardWidth = "330px"
+    const [layout, setLayout] = useState(appLayout)
+    const dimensions = client_env.getWindowDimensions()
+    const cardHeight = (layout === 'minimal' ? dimensions.height - 30 : "190px")
+    const cardWidth = (layout === 'minimal' ? dimensions.width - 30 : "330px")
 
     useEffect(() => {
         fetchData()
@@ -58,13 +63,6 @@ export default function CardList () {
                             minHeight={cardHeight}
                             maxHeight={cardHeight}
                         />
-                        <Skeleton isLoaded={false}
-                            borderRadius={8}
-                            maxWidth={cardWidth}
-                            minWidth={cardWidth}
-                            minHeight={cardHeight}
-                            maxHeight={cardHeight}
-                        />
                     </Grid>
                 </>)    
         )
@@ -84,6 +82,7 @@ export default function CardList () {
                             bulbColor={item.properties.rgb}
                             cardHeight={cardHeight}
                             cardWidth={cardWidth}
+                            appLayout={layout}
                         />
                     </Box>
                 )}

@@ -4,6 +4,7 @@ Client for YeelightHub written in React with Chakra-ui
 
 ## Todo
 
+* Bump ChakraUi to v1.0
 * Change bulb color
 * Change scenes
 * Better view for multiple bulbs in minimal layout

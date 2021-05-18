@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import bulb_on from '../images/bulb_on.svg'
 import bulb_off from '../images/bulb_off.svg'
 import {api} from '../utils/Api'
+import {client_env} from '../utils/Environment'
 
 import { 
     Image,
@@ -17,8 +18,7 @@ import {
     useToast, Skeleton
 } from "@chakra-ui/core"
 
-
-export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, bulbColor, cardWidth, cardHeight}) {
+export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, bulbColor, cardWidth, cardHeight, appLayout}) {
     const toast = useToast()
     const [id, setId] = useState(bulbId)
     const [ip, setIP] = useState(bulbIP)
@@ -29,10 +29,12 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
     const [icon, setIcon] = useState(bulbPower === 'on' ? bulb_on : bulb_off)
     const [isLoading, setIsLoading] = useState(false)
     const [newName, setNewName] = useState(bulbName)
+    const [layout, setLayout] = useState(appLayout)
+    const iconSize = "80%"
 
     function toastError(errorMessage){
         toast({
-            title: "An error occurred",
+            title: "Something went wrong!",
             description: errorMessage,
             status: "error",
             duration: 1500,
@@ -45,7 +47,7 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
         setIsLoading(true)
             
         try {
-            let response = await api.getBulb(ip)
+            let response = await api.getBulb(ip, id)
             response = response.response
             setId(response.id)
             setIP(response.ip)
@@ -67,7 +69,7 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
     const handleBulbClick = () => {
         const togglePower = async (state) => {
             try {
-                await api.changeLampState(ip, state)
+                await api.changeLampState(ip, state, id)
                 setPower(state === 'on' ? true : false)
                 setIcon(state === 'on' ? bulb_on : bulb_off)
             }
@@ -111,11 +113,17 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
             boxShadow="lg"
         >
             <Box width="full" alignContent="center">
-                <Image src={icon} alt="bulb_icon" onClick={ handleBulbClick } />
+                <Image 
+                    src={icon} 
+                    alt="bulb_icon" 
+                    onClick={ handleBulbClick } 
+                    size={ iconSize }
+                    maxWidth={ iconSize }
+                />
             </Box>
             <Box width="full">
-                <Box width="100%" textAlign="right" ml="1" color="gray.600" fontSize="sm" pb="15px">
-                        <Text verticalAlign="text-top" fontSize="xs"> {ip} 
+                <Box width="100%" textAlign="right" ml="1" color="gray.600" fontSize="sm" pb="15px" onClick={ layout === 'minimal' ? fetchData : null }>
+                        <Text verticalAlign="text-top" fontSize="xs" > {ip} 
                             <IconButton 
                                 icon="repeat" 
                                 variant="link" 
@@ -132,13 +140,14 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
                         <Heading>
                             <Editable
                                 minWidth="150px"
-                                maxWidth="200px"
+                                maxWidth={cardWidth - icon.width}
                                 value={ newName } 
                                 defaultValue={ newName }
                                 selectAllOnFocus={true}
                                 onSubmit={ handleSubmit }
                                 onChange={eventValue => setNewName(eventValue)}
                                 isTruncated
+                                isDisabled={ layout === 'minimal' ? true : false }
                             >
                                 <EditablePreview />
                                 <EditableInput />
@@ -148,9 +157,6 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
                     <Box textAlign="right" width="90%">
                         <Badge verticalAlign="top" variantColor="yellow">{model}</Badge>
                     </Box>
-                </Box>
-                <Box height="full" width="full" pt="30px" pl="50px">
-                    <Text as="sub" fontSize="xs" color="gray.200">{ id }</Text>
                 </Box>
             </Box>
         </Flex>

@@ -1,18 +1,58 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Login from './components/Login'
 
 import {
   ThemeProvider,
-  theme,
-  ColorModeProvider,
   CSSReset,
+  theme,
   Box,
   Flex,
   Link,
-  Icon
+  Icon,
+  IconButton,
 } from '@chakra-ui/core'
+import ThemeToggler from './components/ThemeToggler'
 
-export default function App ({ access_token }) {
+
+export default function App ({ access_token, appLayout }) {
+  const [layout, setLayout] = useState(appLayout)
+
+  const Header = () => (
+    <header className="App-header">
+      <Flex width="100%" justify="center">
+          <Box textAlign="center" p={5} >
+            <ThemeToggler />
+          </Box>
+          <Box textAlign="center" p={5} >
+            <IconButton 
+                size="lg"
+                icon="repeat" 
+                variant="ghost" 
+                verticalAlign="top"
+                onClick={
+                  () => {
+                    window.location.reload()
+                  }
+                }
+            />
+          </Box>
+              <Box textAlign="center" p={5} visibility="visible">
+                <IconButton 
+                  size="lg"
+                  icon="small-close" 
+                  variant="ghost" 
+                  verticalAlign="top"
+                  onClick={
+                    () => {
+                      window.localStorage.removeItem('access_token')
+                      window.location.reload()
+                    }
+                  }
+                />
+              </Box>
+        </Flex>
+    </header>
+  )
 
   const Footer = () => (
       <footer className="App-footer">
@@ -35,13 +75,21 @@ export default function App ({ access_token }) {
       </footer>
   )
 
+  const App = () => (
+    layout === 'full' ? 
+      <>
+        <Header/>
+          <Login access_token={access_token} appLayout={layout}/>
+        <Footer/>
+      </>
+    :
+      <Login access_token={access_token} appLayout={layout}/>
+  )
+
   return (
       <ThemeProvider theme={theme}>
         <CSSReset />
-        <ColorModeProvider>
-          <Login access_token={access_token}/>
-          <Footer/>
-        </ColorModeProvider>
+          <App/>
       </ThemeProvider>
     ) 
 }

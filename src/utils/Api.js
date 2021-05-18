@@ -74,11 +74,13 @@ class Api {
         return api.callEndpoint('GET', '/api/bulbs' + fake_bulbs)
     }
 
-    getBulb = (ip) => {
-        return api.callEndpoint('GET', '/api/bulb?ip=' + ip)
+    getBulb = (ip, id) => {
+        console.log(id)
+        return api.callEndpoint('GET', '/api/bulb?ip=' + ip + '&id=' + id)
     }
 
-    changeLampState = (ip, state) => {
+    changeLampState = (ip, state, id) => {
+        console.log(id)
         return api.callEndpoint('POST', '/api/bulb/power?ip=' + ip + '&state=' + state)
     }
     

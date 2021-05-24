@@ -11,7 +11,6 @@ import {
   CircularProgress,
   InputGroup,
   InputRightElement,
-  Icon,
   useToast
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'

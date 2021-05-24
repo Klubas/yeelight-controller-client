@@ -68,24 +68,30 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
         }
     }
 
-    const handleColorChange = async (values) => {
-        try{
-            await api.changeHsvLampColor(ip, values)
-            
-            setHSV(values)
-            //todo: atualizar cor do ícone
-            document.getElementById("root").focus()
-        } catch (error) {
-            toastError(error.message)
-            console.log(error)
-        }
-    }
-
     const handleHsvColorChange = useCallback((hue, sat, val) => {
         let color_values = [hue, sat, val]
-        console.log(color_values)
+
+        const handleColorChange = async (values) => {
+            try{
+                await api.changeHsvLampColor(ip, values)
+                setHSV(values)
+                //todo: atualizar cor do ícone
+                document.getElementById("root").focus()
+            } catch (error) {
+                toast({
+                    title: "Something went wrong!",
+                    description: error.message,
+                    status: "error",
+                    duration: 1500,
+                    isClosable: true,
+                })
+                console.log(error)
+            }
+        }
+
         handleColorChange(color_values)
-    }, [handleColorChange]);
+        
+    }, [ip, toast]);
     
     const handleBulbClick = () => {
         const togglePower = async (state) => {

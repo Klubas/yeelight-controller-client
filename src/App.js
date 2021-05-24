@@ -6,7 +6,6 @@ import {
   Box,
   Flex,
   Link,
-  Icon,
   IconButton
 } from '@chakra-ui/react'
 import { RepeatIcon, SmallCloseIcon, ExternalLinkIcon } from '@chakra-ui/icons'

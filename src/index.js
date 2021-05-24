@@ -3,27 +3,29 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
+import theme from "./utils/theme"
 
 import {client_env} from './utils/Environment'
  
 import {
-  ColorModeProvider
-} from '@chakra-ui/core'
+  ColorModeScript,
+  ChakraProvider
+} from '@chakra-ui/react'
 
 import * as serviceWorker from './serviceWorker'
 
 client_env.validateLocalNetwork()
 client_env.setLayout()
-client_env.setThemeMode()
 
 const app_layout = window.localStorage.getItem('layout')
 const token = window.localStorage.getItem('access_token')
 
 ReactDOM.render(
   <React.StrictMode>
-    <ColorModeProvider >
-      <App access_token={token} appLayout={app_layout}/>
-    </ColorModeProvider>
+      <ColorModeScript initialColorMode={theme.config.initialColorMode}/>
+      <ChakraProvider  theme={theme}>
+        <App access_token={token} appLayout={app_layout}/>
+      </ChakraProvider>
   </React.StrictMode>,
   document.getElementById('root')
 )

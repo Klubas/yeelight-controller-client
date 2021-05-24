@@ -84,10 +84,20 @@ class Api {
         return api.callEndpoint('POST', '/api/bulb/power?ip=' + ip + '&state=' + state)
     }
     
-    changeLampColor = (ip, hexColor) => {
-        const rgbColor = convertHexToRGB(hexColor)
-        const color = rgbColor.r.toString().concat(" ", rgbColor.g.toString(), " ", rgbColor.b.toString())
-        return api.callEndpoint('color', color)
+    changeRgbLampColor = (ip, hexColor) => {
+        return api.callEndpoint('POST', '/api/bulb/color?ip=' + ip + '&mode=rgb&values=' + hexColor.replace('#', ''))
+    }
+
+    changeHsvLampColor = (ip, values) => {
+        return api.callEndpoint('POST', '/api/bulb/color?ip=' + ip + '&mode=hsv&values=' + values[0] + ',' + values[1] + ',' + values[2])
+    }
+
+    changeLampTemp = (ip, temp) => {
+        return api.callEndpoint('POST', '/api/bulb/color?ip=' + ip + '&mode=temp&values=' + temp)
+    }
+
+    changeLampBrightness = (ip, brightness) => {
+        return api.callEndpoint('POST', '/api/bulb/color?ip=' + ip + '&mode=bright&values=' + brightness)
     }
 
     changeLampName = (ip, newName) => {
@@ -110,15 +120,6 @@ const validateResponse = (response) => {
         console.log(error)
         throw new Error(error.message)
     }
-}
-
-function convertHexToRGB(hexColor) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor)
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null
 }
 
 let api_address = process.env.REACT_APP_API_ADDRESS ? process.env.REACT_APP_API_ADDRESS : window.location.href

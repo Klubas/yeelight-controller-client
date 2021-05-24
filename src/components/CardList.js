@@ -3,7 +3,7 @@ import {
     Box, 
     Grid,
     Skeleton,
-} from "@chakra-ui/core"
+} from "@chakra-ui/react"
 
 import Card from '../components/Card'
 import {api} from '../utils/Api'
@@ -79,7 +79,12 @@ export default function CardList ({ appLayout }) {
                             bulbName={item.name}
                             bulbModel={item.model}
                             bulbPower={item.properties.power}
-                            bulbColor={item.properties.rgb}
+                            bulbRGB={Number(item.properties.rgb).toString(16)} // convert decimal color to hex
+                            bulbHSV={[
+                                item.properties.hue
+                                ,item.properties.sat
+                                ,item.properties.bright
+                            ]}
                             cardHeight={cardHeight}
                             cardWidth={cardWidth}
                             appLayout={layout}

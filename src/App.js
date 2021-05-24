@@ -1,17 +1,15 @@
 import React, { useState } from 'react'
 import Login from './components/Login'
+import ThemeToggler from './components/ThemeToggler'
 
 import {
-  ThemeProvider,
-  CSSReset,
-  theme,
   Box,
   Flex,
   Link,
   Icon,
-  IconButton,
-} from '@chakra-ui/core'
-import ThemeToggler from './components/ThemeToggler'
+  IconButton
+} from '@chakra-ui/react'
+import { RepeatIcon, SmallCloseIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 
 
 export default function App ({ access_token, appLayout }) {
@@ -26,7 +24,7 @@ export default function App ({ access_token, appLayout }) {
           <Box textAlign="center" p={5} >
             <IconButton 
                 size="lg"
-                icon="repeat" 
+                icon={<RepeatIcon/>}
                 variant="ghost" 
                 verticalAlign="top"
                 onClick={
@@ -39,7 +37,7 @@ export default function App ({ access_token, appLayout }) {
               <Box textAlign="center" p={5} visibility="visible">
                 <IconButton 
                   size="lg"
-                  icon="small-close" 
+                  icon={<SmallCloseIcon/>}
                   variant="ghost" 
                   verticalAlign="top"
                   onClick={
@@ -68,7 +66,7 @@ export default function App ({ access_token, appLayout }) {
             </Link> 
             from&nbsp;
             <Link href="https://www.flaticon.com/" title="Flaticon" isExternal>
-                www.flaticon.com <Icon name="external-link" mx="2px" />&nbsp;
+                www.flaticon.com <ExternalLinkIcon mx="2px" />&nbsp;
             </Link>
           </Box>
         </Flex>
@@ -86,10 +84,5 @@ export default function App ({ access_token, appLayout }) {
       <Login access_token={access_token} appLayout={layout}/>
   )
 
-  return (
-      <ThemeProvider theme={theme}>
-        <CSSReset />
-          <App/>
-      </ThemeProvider>
-    ) 
+  return (<App/>) 
 }

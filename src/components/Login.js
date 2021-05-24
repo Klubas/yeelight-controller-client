@@ -13,7 +13,8 @@ import {
   InputRightElement,
   Icon,
   useToast
-} from '@chakra-ui/core'
+} from '@chakra-ui/react'
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
 import {api} from '../utils/Api'
 import CardList from './CardList'
@@ -105,17 +106,13 @@ export default function Login({ access_token, appLayout }) {
                         variant="ghost"
                         onClick={handlePasswordVisibility}
                       >
-                        {showPassword ? (
-                          <Icon name="view-off"/>
-                        ) : (
-                          <Icon name="view"/>
-                        )}
+                        {showPassword ? (<ViewOffIcon/>) : (<ViewIcon/>)}
                       </Button>
                     </InputRightElement>
                   </InputGroup>
                 </FormControl>
                 <Button
-                  variantColor="yellow"
+                  colorScheme="yellow"
                   variant="outline"
                   type="submit"
                   width="full"

@@ -1,6 +1,4 @@
 class Environment {
-    constructor() {}
-
     setThemeMode(){
         window.localStorage.setItem(
             'darkMode', process.env.REACT_APP_DEFAULT_COLOR_MODE === 'dark' ? true : false)
@@ -14,8 +12,6 @@ class Environment {
             const dimensions = this.getWindowDimensions()
             const height = dimensions.height
             const width = dimensions.width
-
-            /*alert(dimensions.width + 'x' + dimensions.height)*/
 
             if (width <= 480 && height <= 320) {
                 layout = 'minimal'

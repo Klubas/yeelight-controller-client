@@ -8,6 +8,8 @@ Client for YeelightHub written in React with Chakra-ui
 * Change bulb color
 * Change scenes
 * Better view for multiple bulbs in minimal layout
+* Cache found bulbs
+* Webhook/websocket to auto update lamp status
 
 ## Environment Variables
 

@@ -1,8 +1,8 @@
-import React, {useState} from 'react'
+import React, {useState, useCallback} from 'react'
 import bulb_on from '../images/bulb_on.svg'
 import bulb_off from '../images/bulb_off.svg'
+import HsvColorSlider from './HsvColorSlider'
 import {api} from '../utils/Api'
-import {client_env} from '../utils/Environment'
 
 import { 
     Image,
@@ -15,23 +15,26 @@ import {
     EditablePreview,
     Heading, 
     IconButton,
-    useToast, Skeleton
-} from "@chakra-ui/core"
+    useToast, 
+    Skeleton,
+} from "@chakra-ui/react"
+import { RepeatIcon } from '@chakra-ui/icons'
 
-export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, bulbColor, cardWidth, cardHeight, appLayout}) {
+export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, bulbRGB, bulbHSV, cardWidth, cardHeight, appLayout}) {
     const toast = useToast()
     const [id, setId] = useState(bulbId)
     const [ip, setIP] = useState(bulbIP)
     const [name, setName] = useState(bulbName)
     const [model, setModel] = useState(bulbModel)
     const [power, setPower] = useState(bulbPower === 'on' ? true : false)
-    const [color, setColor] = useState(bulbColor)
+    const [hsv, setHSV] = useState(bulbHSV)
+    const [colorPicker, setColorPicker] = useState(false)
     const [icon, setIcon] = useState(bulbPower === 'on' ? bulb_on : bulb_off)
     const [isLoading, setIsLoading] = useState(false)
     const [newName, setNewName] = useState(bulbName)
     const [layout, setLayout] = useState(appLayout)
     const iconSize = "80%"
-
+    
     function toastError(errorMessage){
         toast({
             title: "Something went wrong!",
@@ -54,7 +57,6 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
             setName(response.name)
             setModel(response.model)
             setPower(response.properties.power)
-            setColor(response.properties.rgb)
             setIcon(response.properties.power === 'on' ? bulb_on : bulb_off)
             setNewName(response.name)
             setIsLoading(false)
@@ -65,6 +67,25 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
             console.log(error)
         }
     }
+
+    const handleColorChange = async (values) => {
+        try{
+            await api.changeHsvLampColor(ip, values)
+            
+            setHSV(values)
+            //todo: atualizar cor do ícone
+            document.getElementById("root").focus()
+        } catch (error) {
+            toastError(error.message)
+            console.log(error)
+        }
+    }
+
+    const handleHsvColorChange = useCallback((hue, sat, val) => {
+        let color_values = [hue, sat, val]
+        console.log(color_values)
+        handleColorChange(color_values)
+    }, [handleColorChange]);
     
     const handleBulbClick = () => {
         const togglePower = async (state) => {
@@ -83,9 +104,10 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
         power ? togglePower('off') : togglePower('on')
     }
 
-    const handleSubmit = async (event) => {
+    const handleNameChange = async (event) => {
         const currentName = name
         const changedName = newName
+        
         try {
             if (changedName !== currentName) {
                 await api.changeLampName(ip, changedName)
@@ -116,48 +138,63 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
                 <Image 
                     src={icon} 
                     alt="bulb_icon" 
-                    onClick={ handleBulbClick } 
+                    onClick={ handleBulbClick }
                     size={ iconSize }
                     maxWidth={ iconSize }
                 />
             </Box>
             <Box width="full">
-                <Box width="100%" textAlign="right" ml="1" color="gray.600" fontSize="sm" pb="15px" onClick={ layout === 'minimal' ? fetchData : null }>
-                        <Text verticalAlign="text-top" fontSize="xs" > {ip} 
-                            <IconButton 
-                                icon="repeat" 
-                                variant="link" 
-                                verticalAlign="baseline" 
-                                size="xs"
-                                pb="2px"
-                                onClick={ fetchData }
-                            />
-                        </Text>
-                        
-                </Box>
-                <Box>
-                    <Flex textAlign="left" verticalAlign="center">
-                        <Heading>
-                            <Editable
-                                minWidth="150px"
-                                maxWidth={cardWidth - icon.width}
-                                value={ newName } 
-                                defaultValue={ newName }
-                                selectAllOnFocus={true}
-                                onSubmit={ handleSubmit }
-                                onChange={eventValue => setNewName(eventValue)}
-                                isTruncated
-                                isDisabled={ layout === 'minimal' ? true : false }
-                            >
-                                <EditablePreview />
-                                <EditableInput />
-                            </Editable>
-                        </Heading>
-                    </Flex>
-                    <Box textAlign="right" width="90%">
-                        <Badge verticalAlign="top" variantColor="yellow">{model}</Badge>
-                    </Box>
-                </Box>
+                { colorPicker 
+                    ? <Box width="100%" height="100%">
+                        <HsvColorSlider 
+                            h={ hsv[0] }
+                            s={ hsv[1] }
+                            v={ hsv[2] }
+                            onChange={ handleHsvColorChange } />
+                     </Box>
+                    : <>
+                        <Box width="100%" textAlign="right" ml="1" color="gray.600" fontSize="sm" pb="15px" onClick={ layout === 'minimal' ? fetchData : null }>
+                                <Text verticalAlign="text-top" fontSize="xs" > {ip} 
+                                    <IconButton 
+                                        icon={<RepeatIcon/>} 
+                                        variant="link" 
+                                        verticalAlign="baseline" 
+                                        size="xs"
+                                        pb="2px"
+                                        onClick={ fetchData }
+                                    />
+                                </Text>
+                                
+                        </Box>
+                        <Box>
+                            <Flex textAlign="left" verticalAlign="center">
+                                <Heading>
+                                    <Editable
+                                        minWidth="150px"
+                                        maxWidth={cardWidth - icon.width}
+                                        value={ newName } 
+                                        defaultValue={ newName }
+                                        selectAllOnFocus={true}
+                                        onSubmit={ handleNameChange }
+                                        onChange={eventValue => setNewName(eventValue)}
+                                        isTruncated
+                                        isDisabled={ layout === 'minimal' ? true : false }
+                                    >
+                                        <EditablePreview />
+                                        <EditableInput />
+                                    </Editable>
+                                </Heading>
+                            </Flex>
+                            <Box textAlign="right" width="90%">
+                                <Badge 
+                                    verticalAlign="top" 
+                                    colorScheme="yellow" 
+                                    onDoubleClick={event => setColorPicker(true) }>{model}
+                                </Badge>
+                            </Box>
+                        </Box>   
+                    </>
+                }
             </Box>
         </Flex>
         </Skeleton>

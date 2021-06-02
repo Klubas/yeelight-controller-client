@@ -12,15 +12,7 @@ import BulbDescription from './BulbDescription'
 
 import { kelvinToHex, colorToHex } from '../utils/scripts'
 
-export default function Card ({ 
-        bulbIP
-        , bulbName
-        , bulbModel
-        , bulbPower
-        , bulbColors
-        , cardWidth
-        , cardHeight
-}){
+export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight}) {
     const [ip, ] = useState(bulbIP)
     const [name, ] = useState(bulbName)
     const [model, ] = useState(bulbModel)
@@ -34,11 +26,13 @@ export default function Card ({
         
         const hexColor = () => {
             let color_mode = window.localStorage.getItem('color_mode')
-            if (color_mode === 'rgb')    { return(colorToHex(bulbColors.rgb))   }
-            if (color_mode === 'hsv')    { return(colorToHex(bulbColors.hsv))   }
-            if (color_mode === 'bright') { return(colorToHex(bulbColors.hsv))   }
-            if (color_mode === 'temp')   { return(kelvinToHex(bulbColors.temp)) }
-            return(colorToHex(bulbColors.rgb))
+            switch (color_mode) {
+                case 'rgb': return(colorToHex(bulbColors.rgb))
+                case 'hsv': return(colorToHex(bulbColors.hsv))
+                case 'bright': return(colorToHex(bulbColors.hsv))
+                case 'temp': return(kelvinToHex(bulbColors.temp)) 
+                default: return(colorToHex(bulbColors.rgb))
+            }
         }
 
         let obj = bulbColors
@@ -48,26 +42,27 @@ export default function Card ({
 
     function setBulbColors (color_mode, values) {
         let obj = colors
-        if (color_mode === 'rgb') {
-            obj.rgb = values
-            obj.hex = colorToHex(obj.rgb)
-        }
-
-        if (color_mode === 'hsv') {
-            obj.hsv = values
-            obj.bright = values.v
-            obj.hex = colorToHex(obj.hsv)
-        }
-
-        if (color_mode === 'bright') {
-            obj.hsv.v = values
-            obj.bright = values
-            obj.hex = colorToHex(obj.hsv)
-        }
-
-        if (color_mode === 'temp') {
-            obj.temp = values
-            obj.hex = kelvinToHex(obj.temp)
+        switch (color_mode) {
+            case 'rgb':
+                obj.rgb = values
+                obj.hex = colorToHex(obj.rgb)
+            break;
+            case 'hsv':
+                obj.hsv = values
+                obj.bright = values.v
+                obj.hex = colorToHex(obj.hsv)
+            break;
+            case 'bright':
+                obj.hsv.v = values
+                obj.bright = values
+                obj.hex = colorToHex(obj.hsv)
+            break;
+            case 'temp':
+                obj.temp = values
+                obj.hex = kelvinToHex(obj.temp)
+            break;
+            default:
+                throw new Error('Invalid value:' + color_mode)
         }
         setHexColor(obj.hex) // This doesn't make sense, but without it the props bulbHexColor won't update until the next render
         setColors(obj)

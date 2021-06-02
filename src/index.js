@@ -1,11 +1,9 @@
-
-
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 import theme from "./utils/theme"
 
-import {client_env} from './utils/Environment'
+import {validateLocalNetwork, setLayout} from './utils/scripts'
  
 import {
   ColorModeScript,
@@ -14,8 +12,8 @@ import {
 
 import * as serviceWorker from './serviceWorker'
 
-client_env.validateLocalNetwork()
-client_env.setLayout()
+setLayout()
+validateLocalNetwork()
 
 const app_layout = window.localStorage.getItem('layout')
 const token = window.localStorage.getItem('access_token')

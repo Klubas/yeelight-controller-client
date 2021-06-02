@@ -1,132 +1,97 @@
-import React, {useState, useCallback} from 'react'
-import bulb_on from '../images/bulb_on.svg'
-import bulb_off from '../images/bulb_off.svg'
-import HsvColorSlider from './HsvColorSlider'
-import {api} from '../utils/Api'
+import React, {useState} from 'react'
 
 import { 
-    Image,
-    Flex, 
     Box, 
-    Badge,
-    Text,
-    Editable,
-    EditableInput,
-    EditablePreview,
-    Heading, 
-    IconButton,
-    useToast, 
+    Flex, 
     Skeleton,
 } from "@chakra-ui/react"
-import { RepeatIcon } from '@chakra-ui/icons'
 
-export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, bulbRGB, bulbHSV, cardWidth, cardHeight, appLayout}) {
-    const toast = useToast()
-    const [id, setId] = useState(bulbId)
-    const [ip, setIP] = useState(bulbIP)
-    const [name, setName] = useState(bulbName)
-    const [model, setModel] = useState(bulbModel)
-    const [power, setPower] = useState(bulbPower === 'on' ? true : false)
-    const [hsv, setHSV] = useState(bulbHSV)
+import Bulb from './Bulb'
+import ColorChanger from './ColorChanger'
+import BulbDescription from './BulbDescription'
+
+import { kelvinToHex, colorToHex } from '../utils/scripts'
+
+export default function Card ({ 
+        bulbIP
+        , bulbName
+        , bulbModel
+        , bulbPower
+        , bulbColors
+        , cardWidth
+        , cardHeight
+}){
+    const [ip, ] = useState(bulbIP)
+    const [name, ] = useState(bulbName)
+    const [model, ] = useState(bulbModel)
+    const [power, ] = useState(bulbPower === 'on' ? true : false)
     const [colorPicker, setColorPicker] = useState(false)
-    const [icon, setIcon] = useState(bulbPower === 'on' ? bulb_on : bulb_off)
-    const [isLoading, setIsLoading] = useState(false)
-    const [newName, setNewName] = useState(bulbName)
-    const [layout, setLayout] = useState(appLayout)
-    const iconSize = "80%"
-    
-    function toastError(errorMessage){
-        toast({
-            title: "Something went wrong!",
-            description: errorMessage,
-            status: "error",
-            duration: 1500,
-            isClosable: true,
-        })
-    }
+    const [isLoading, ] = useState(false)
+    const [, setHexColor] = useState()
+    const [colors, setColors] = useState(() => getBulbColors())
 
-    async function fetchData() {
-
-        setIsLoading(true)
-            
-        try {
-            let response = await api.getBulb(ip, id)
-            response = response.response
-            setId(response.id)
-            setIP(response.ip)
-            setName(response.name)
-            setModel(response.model)
-            setPower(response.properties.power)
-            setIcon(response.properties.power === 'on' ? bulb_on : bulb_off)
-            setNewName(response.name)
-            setIsLoading(false)
-
-        } catch (error) {
-            toastError(error.message)
-            setIsLoading(false)
-            console.log(error)
-        }
-    }
-
-    const handleHsvColorChange = useCallback((hue, sat, val) => {
-        let color_values = [hue, sat, val]
-
-        const handleColorChange = async (values) => {
-            try{
-                await api.changeHsvLampColor(ip, values)
-                setHSV(values)
-                //todo: atualizar cor do ícone
-                document.getElementById("root").focus()
-            } catch (error) {
-                toast({
-                    title: "Something went wrong!",
-                    description: error.message,
-                    status: "error",
-                    duration: 1500,
-                    isClosable: true,
-                })
-                console.log(error)
-            }
-        }
-
-        handleColorChange(color_values)
+    function getBulbColors(){
         
-    }, [ip, toast]);
-    
-    const handleBulbClick = () => {
-        const togglePower = async (state) => {
-            try {
-                await api.changeLampState(ip, state, id)
-                setPower(state === 'on' ? true : false)
-                setIcon(state === 'on' ? bulb_on : bulb_off)
-            }
-            catch (error){
-                setPower(power === 'on' ? true : false)
-                setIcon(power === 'on' ? bulb_on : bulb_off)
-                toastError(error.message)
-                console.log(error)
-            }
+        const hexColor = () => {
+            let color_mode = window.localStorage.getItem('color_mode')
+            if (color_mode === 'rgb')    { return(colorToHex(bulbColors.rgb))   }
+            if (color_mode === 'hsv')    { return(colorToHex(bulbColors.hsv))   }
+            if (color_mode === 'bright') { return(colorToHex(bulbColors.hsv))   }
+            if (color_mode === 'temp')   { return(kelvinToHex(bulbColors.temp)) }
+            return(colorToHex(bulbColors.rgb))
         }
-        power ? togglePower('off') : togglePower('on')
+
+        let obj = bulbColors
+        obj.hex = hexColor()
+        return obj
     }
 
-    const handleNameChange = async (event) => {
-        const currentName = name
-        const changedName = newName
-        
-        try {
-            if (changedName !== currentName) {
-                await api.changeLampName(ip, changedName)
-                setName(changedName)
-                document.getElementById("root").focus()
-            }
-        } catch (error) {
-            toastError(error.message)
-            setNewName(currentName)
-            console.log(error)
+    function setBulbColors (color_mode, values) {
+        let obj = colors
+        if (color_mode === 'rgb') {
+            obj.rgb = values
+            obj.hex = colorToHex(obj.rgb)
         }
-      }
 
+        if (color_mode === 'hsv') {
+            obj.hsv = values
+            obj.bright = values.v
+            obj.hex = colorToHex(obj.hsv)
+        }
+
+        if (color_mode === 'bright') {
+            obj.hsv.v = values
+            obj.bright = values
+            obj.hex = colorToHex(obj.hsv)
+        }
+
+        if (color_mode === 'temp') {
+            obj.temp = values
+            obj.hex = kelvinToHex(obj.temp)
+        }
+        setHexColor(obj.hex) // This doesn't make sense, but without it the props bulbHexColor won't update until the next render
+        setColors(obj)
+    }
+
+    const BulbColorChanger = () => (
+        <Box width="full" onDoubleClick={() => setColorPicker(false) }>
+            <ColorChanger 
+                bulbIP={ ip } 
+                bulbHSV = { colors.hsv } 
+                bulbCt={ colors.temp } 
+                bulbRGB={ colors.rgb }
+                bulbBrightness = { colors.bright }
+                onChange={ setBulbColors }
+            />
+        </Box>
+    )
+    
+    const BulbMetaData = () => (<>
+        <Box width="full" onDoubleClick={() => setColorPicker(true) }>
+            <BulbDescription bulbIP={ ip } bulbName={ name } bulbModel={ model }/>
+        </Box>   
+    </>)
+    
     return (
         <Skeleton isLoaded={!isLoading} borderRadius={8}>
         <Flex 
@@ -136,72 +101,12 @@ export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, 
             maxWidth={cardWidth}
             minHeight={cardHeight}
             maxHeight={cardHeight}
-            borderWidth={1}
-            borderRadius={8}
             boxShadow="lg"
         >
-            <Box width="full" alignContent="center">
-                <Image 
-                    src={icon} 
-                    alt="bulb_icon" 
-                    onClick={ handleBulbClick }
-                    size={ iconSize }
-                    maxWidth={ iconSize }
-                />
-            </Box>
-            <Box width="full">
-                { colorPicker 
-                    ? <Box width="100%" height="100%">
-                        <HsvColorSlider 
-                            h={ hsv[0] }
-                            s={ hsv[1] }
-                            v={ hsv[2] }
-                            onChange={ handleHsvColorChange } />
-                     </Box>
-                    : <>
-                        <Box width="100%" textAlign="right" ml="1" color="gray.600" fontSize="sm" pb="15px" onClick={ layout === 'minimal' ? fetchData : null }>
-                                <Text verticalAlign="text-top" fontSize="xs" > {ip} 
-                                    <IconButton 
-                                        icon={<RepeatIcon/>} 
-                                        variant="link" 
-                                        verticalAlign="baseline" 
-                                        size="xs"
-                                        pb="2px"
-                                        onClick={ fetchData }
-                                    />
-                                </Text>
-                                
-                        </Box>
-                        <Box>
-                            <Flex textAlign="left" verticalAlign="center">
-                                <Heading>
-                                    <Editable
-                                        minWidth="150px"
-                                        maxWidth={cardWidth - icon.width}
-                                        value={ newName } 
-                                        defaultValue={ newName }
-                                        selectAllOnFocus={true}
-                                        onSubmit={ handleNameChange }
-                                        onChange={eventValue => setNewName(eventValue)}
-                                        isTruncated
-                                        isDisabled={ layout === 'minimal' ? true : false }
-                                    >
-                                        <EditablePreview />
-                                        <EditableInput />
-                                    </Editable>
-                                </Heading>
-                            </Flex>
-                            <Box textAlign="right" width="90%">
-                                <Badge 
-                                    verticalAlign="top" 
-                                    colorScheme="yellow" 
-                                    onDoubleClick={event => setColorPicker(true) }>{model}
-                                </Badge>
-                            </Box>
-                        </Box>   
-                    </>
-                }
-            </Box>
+        <Box width="full">
+            <Bulb bulbIP={ip} bulbPower={ power } bulbHexColor={ colors.hex }/>
+        </Box>
+            { colorPicker ? <BulbColorChanger/> : <BulbMetaData/>}
         </Flex>
         </Skeleton>
     )       

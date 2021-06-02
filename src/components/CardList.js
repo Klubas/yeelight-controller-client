@@ -1,104 +1,126 @@
 import React, { useState, useEffect } from 'react'
+
 import { 
     Box, 
     Grid,
     Skeleton,
+    useToast
 } from "@chakra-ui/react"
 
 import Card from '../components/Card'
-import {api} from '../utils/Api'
-import {client_env} from '../utils/Environment'
-import ErrorMessage from './ErrorMessage'
+import ErrorMessage from '../components/ErrorMessage'
 
+import { getAllBulbs } from '../utils/Api'
+import { getWindowDimensions } from '../utils/scripts'
 
-
-export default function CardList ({ appLayout }) {
+export default function CardList ({ loadData, appLayout }) {
     const [cardData, setCardData] = useState([])
+    const [skelCount, setSkelCount] = useState(1)
     const [error, setError] = useState('')
-    const [layout, setLayout] = useState(appLayout)
-    const dimensions = client_env.getWindowDimensions()
+    const [layout] = useState(appLayout)
+    const dimensions = getWindowDimensions()
     const cardHeight = (layout === 'minimal' ? dimensions.height - 30 : "190px")
     const cardWidth = (layout === 'minimal' ? dimensions.width - 30 : "330px")
+    const toast = useToast()
 
     useEffect(() => {
-        fetchData()
-    }, [])
+        
+        const fetchData = async () => {
+            
+            try {
+                let response = await getAllBulbs()
+                response = response.response
+                if (response.length > 0) {
+                    setSkelCount(response.length)
+                    setError('')
+                    setCardData(response)
+                } else {
+                    throw new Error('No bulbs found!')
+                }
 
-    const fetchData = async () => {
-
-        try {
-            let response = await api.getAllBulbs()
-            response = response.response
-            if (response.length > 0) {
-                setCardData(response)
-                setError('')
-            } else {
-                throw new Error('No bulbs found!')
+            } catch (error) {
+                toast({
+                    title: "Something went wrong!",
+                    description: error.message,
+                    status: "error",
+                    duration: 1500,
+                    isClosable: true,
+                })
+                console.log(error)
+                setError(error.message)
+                setSkelCount()
+                setCardData([])
             }
-        } catch (error) {
-            setError(error.message)
-            console.log(error)
         }
-    }
+
+        fetchData()
+
+    }, [toast])
+
+    const LoadError = () => (
+        <Box 
+            borderRadius={8}
+            minWidth={cardWidth}
+            maxWidth={cardWidth}
+            minHeight={cardHeight}
+            maxHeight={cardHeight}
+        >
+            <ErrorMessage message={error}/>
+        </Box>
+    )
 
     const Loading = () => {
-        return (
-            error 
-                ? (<>
-                    <Box 
+        let skels = []
+        for(let skel = 0; skel <= skelCount + 1; skel++) skels.push(skel)
+        return (<>
+            {skels.map((i) =>
+                <Box key={i} maxWidth="100%">
+                    <Skeleton 
+                        isLoaded={ false }
                         borderRadius={8}
-                        minWidth={cardWidth}
                         maxWidth={cardWidth}
+                        minWidth={cardWidth}
                         minHeight={cardHeight}
                         maxHeight={cardHeight}
-                    >
-                        <ErrorMessage message={error}/> 
-                    </Box>
-                </>) : (<>
-                    <Grid gap="6">
-                        <Skeleton isLoaded={false}
-                            borderRadius={8}
-                            maxWidth={cardWidth}
-                            minWidth={cardWidth}
-                            minHeight={cardHeight}
-                            maxHeight={cardHeight}
-                        />
-                    </Grid>
-                </>)    
-        )
+                    />
+                </Box>
+            )}
+        </>)
     }
-
-    const Bulbs = () => {
-        return (
-                <Grid gap="6">
-                {cardData.map((item) => 
-                    <Box key={item.id} maxWidth="100%">
-                        <Card 
-                            bulbId={item.id}
-                            bulbIP={item.ip} 
-                            bulbName={item.name}
-                            bulbModel={item.model}
-                            bulbPower={item.properties.power}
-                            bulbRGB={Number(item.properties.rgb).toString(16)} // convert decimal color to hex
-                            bulbHSV={[
-                                item.properties.hue
-                                ,item.properties.sat
-                                ,item.properties.bright
-                            ]}
-                            cardHeight={cardHeight}
-                            cardWidth={cardWidth}
-                            appLayout={layout}
-                        />
-                    </Box>
-                )}
-                </Grid>
-        )
-    }
+            
+    const Bulbs = () => (<>
+        { ! cardData.length ? <Loading/> : cardData.map((item) => 
+            <Box key={item.id} maxWidth="100%">
+                <Card 
+                    bulbId={item.id}
+                    bulbIP={item.ip} 
+                    bulbName={item.name}
+                    bulbModel={item.model}
+                    bulbPower={item.properties.power}
+                    bulbColors={{
+                        rgb: { 
+                            r: Math.floor(item.properties.rgb / (256*256)),
+                            g: Math.floor(item.properties.rgb / 256) % 256,
+                            b: item.properties.rgb % 256 
+                        }, // convert decimal color to rgb values
+                        hsv: {
+                            h: item.properties.hue,
+                            s: item.properties.sat,
+                            v: item.properties.bright
+                        },
+                        bright: item.properties.current_brightness,
+                        temp: item.properties.ct
+                    }}
+                    cardHeight={cardHeight}
+                    cardWidth={cardWidth}
+                />
+            </Box>
+        )}
+    </>)
 
     return (<>
-        { ! cardData.length
-            ? ( <Loading/> )
-            : ( <Bulbs/>)
-        }
+        <Grid gap="6">
+            { ! error ? <Bulbs/> : <LoadError/> }
+        </Grid>
     </>)
 }

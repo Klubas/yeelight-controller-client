@@ -64,12 +64,12 @@ export const colorToRgb = (color) => {
 export const colorToHex = (color, str=true) => {
     let tinycolor = require("tinycolor2")
     color = tinycolor(color)
-    
+    /*
     console.log('Brightness: ' + color.getBrightness())
     console.log('IsDark: ' + color.isDark())
     console.log('IsLight: ' + color.isLight())
     console.log('Luminance: ' + color.getLuminance())
-
+    */
     if (str) {
         return color.toHexString()
     }

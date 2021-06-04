@@ -1,17 +1,27 @@
+let basic_login = null
 const rootAddress = process.env.REACT_APP_API_ADDRESS 
                     ? process.env.REACT_APP_API_ADDRESS 
                     : window.location.href
 
 console.log(rootAddress)
 
-const callEndpoint = async (method, endpoint, data = null) => {
+const getAuth = (auth) => {
+    switch (auth) {
+        case 'Bearer': 
+            return 'Bearer ' + window.localStorage.getItem('access_token')
+        default: 
+            return auth
+    }
+}
+
+const callEndpoint = async (method, endpoint, data = null, auth = 'Bearer') => {
     const url = rootAddress + endpoint
     const settings = {
         method: method,
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'text/html',
-            'Authorization': 'Bearer ' + window.localStorage.getItem('access_token')
+            'Authorization': getAuth(auth)
         }
     }
 
@@ -26,45 +36,20 @@ const callEndpoint = async (method, endpoint, data = null) => {
         .then(jsonData => response = jsonData.message)
     
     try {
-        if (response.status === 'SUCCESS') {
-            return response
-        } else {
-            throw new Error (response.description)
-        } 
-
+        switch (response.status) {
+            case 'SUCCESS':
+                return response
+            case 'LOGIN_SUCCESS':
+                window.localStorage.setItem('access_token', response.response)
+                basic_login = null
+                return response.description
+            default:
+                throw new Error (response.description)
+        }
     } catch (error) {
         console.log(error)
         throw new Error('Unexpected error')
     }    
-}
-
-const basicLogin = async (username, password) => {
-    const url = rootAddress + '/api/logon'
-    const auth = Buffer.from(username + ':' + password).toString('base64')
-    const settings = {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Basic ' + auth
-        },
-    }
-
-    let response
-
-    await fetch(url, settings)
-        .then(response => validateResponse(response))
-        .then(jsonData => response = jsonData.message
-    )
-    try {
-        if (response.status === 'LOGIN_SUCCESS') {
-            window.localStorage.setItem('access_token', response.response)
-            return response.description
-        } else {
-            throw new Error (response.description)
-        } 
-    } catch (error) {
-        throw new Error ('Unexpected error')
-    }
 }
 
 const validateResponse = (response) => {
@@ -85,7 +70,8 @@ const validateResponse = (response) => {
 }
 
 export const login = (username, password) => {
-    return basicLogin(username, password)
+    basic_login = 'Basic ' + Buffer.from(username + ':' + password).toString('base64')
+    return callEndpoint('POST', '/api/logon', null, basic_login)
 }
 
 export const getAllBulbs = () => {

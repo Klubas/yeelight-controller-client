@@ -1,34 +1,43 @@
-import React, {useState, useCallback} from 'react'
+import React, {useCallback} from 'react'
 import ColorSlider from './ColorSlider'
  
-export default function HsvColorSlider ({ h, s, v, onChange }) {
-    const [hue, setHue] = useState(h)
-    const [sat, setSaturation] = useState(s)
-    const [val, setValue] = useState(v)
+export default function HsvColorSlider ({ hsv, onChange }) {
 
-    const handleHueChange = useCallback(value => {
-        setHue(value)
-        let values=[value, sat, val]
-        onChange('hsv', values)
-    }, [sat, val, onChange]);
+    const handleHueChange = useCallback(hue => {
+        const color = {
+            h: hue,
+            s: hsv.s,
+            v: hsv.v
+        }
 
-    const handleSatChange = useCallback(value => {
-        setSaturation(value)
-        let values=[hue, value, val]
-        onChange('hsv', values)
-    }, [hue, val, onChange]);
+        onChange('hsv', color)
+    }, [hsv, onChange]);
+
+    const handleSatChange = useCallback(saturation => {
+        const color = {
+            h: hsv.h,
+            s: saturation,
+            v: hsv.v
+        }
+
+        onChange('hsv', color)
+    }, [hsv, onChange]);
 
     const handleValueChange = useCallback(value => {
-        setValue(value)
-        let values=[hue, sat, value]
-        onChange('hsv', values)
-    }, [hue, sat, onChange]);
+        const color = {
+            h: hsv.h,
+            s: hsv.s,
+            v: value
+        }
+
+        onChange('hsv', color)
+    }, [hsv, onChange]);
 
     return (
         <>
-            <ColorSlider min={1} max={360} defaultValue={hue} onChange={ (event) => handleHueChange(event) } label='Hue' />
-            <ColorSlider min={40} max={100} defaultValue={sat} onChange={ (event) => handleSatChange(event) } label='Saturation'/>
-            <ColorSlider min={20} max={100} defaultValue={val} onChange={ (event) => handleValueChange(event) } label='Value'/>
+            <ColorSlider min={1} max={360} defaultValue={hsv.h} onChange={ (event) => handleHueChange(event) } label='Hue' />
+            <ColorSlider min={40} max={100} defaultValue={hsv.s} onChange={ (event) => handleSatChange(event) } label='Saturation'/>
+            <ColorSlider min={20} max={100} defaultValue={hsv.v} onChange={ (event) => handleValueChange(event) } label='Value'/>
         </>
     )
 }

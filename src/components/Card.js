@@ -53,12 +53,12 @@ export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColo
                 obj.hex = colorToHex(obj.hsv)
             break;
             case 'bright':
-                obj.hsv.v = values
-                obj.bright = values
+                obj.hsv.v = values.bright
+                obj.bright = values.bright
                 obj.hex = colorToHex(obj.hsv)
             break;
             case 'temp':
-                obj.temp = values
+                obj.temp = values.temp
                 obj.hex = kelvinToHex(obj.temp)
             break;
             default:
@@ -77,6 +77,7 @@ export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColo
                 bulbRGB={ colors.rgb }
                 bulbBrightness = { colors.bright }
                 onChange={ setBulbColors }
+                colorMode={ 'hsv' }
             />
         </Box>
     )

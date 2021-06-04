@@ -12,18 +12,19 @@ import BrightnessSlider from './Sliders/BrightnessSlider'
 
 import {changeLampColor} from '../utils/Api'
 
-export default function ColorChanger ({ bulbIP, bulbHSV, bulbRGB, bulbCt, bulbBrightness, onChange }) {
+export default function ColorChanger ({ colorMode, bulbIP, bulbHSV, bulbRGB, bulbCt, bulbBrightness, onChange }) {
     const [ip, ] = useState(bulbIP)
     const [hsv, ] = useState(bulbHSV)
     const [rgb, ] = useState(bulbRGB)
     const [temperature, ] = useState(bulbCt)
     const [brightness, ] = useState(bulbBrightness)
+    const [mode, ] = useState(colorMode)
     const toast = useToast()
 
     const handleColorChange = async (mode, values) => {
         
         try{
-            await changeLampColor(ip, mode, values)
+            await changeLampColor(ip, mode, Object.values(values))
             onChange(mode, values)
             window.localStorage.setItem('color_mode', mode)
         } catch (error) {
@@ -38,16 +39,47 @@ export default function ColorChanger ({ bulbIP, bulbHSV, bulbRGB, bulbCt, bulbBr
         }
     };
 
+    const RGBMode = () => (
+        <RgbColorSlider
+            rgb={ rgb }
+            onChange={ handleColorChange }
+        />
+    )
+
+    const HSVMode = () => (
+        <HsvColorSlider
+            hsv={ hsv }
+            onChange={ handleColorChange }
+        />
+    )
+
+    const BrightMode = () => (
+        <BrightnessSlider
+            brightness={ brightness } 
+            onChange={ handleColorChange }
+        />
+    )
+
+    const TempMode = () => (
+        <TemperatureSlider
+            temperature={ temperature } 
+            onChange={ handleColorChange }
+        />
+    )
+
+    const SliderMode = () => {
+        switch(mode){
+            case 'rgb': return RGBMode(); 
+            case 'hsv': return HSVMode(); 
+            case 'bright': return BrightMode(); 
+            case 'temp': return TempMode(); 
+            default: return 'Color mode ' + mode + ':('; 
+        }
+    }
+
     return(
         <Box width="100%" height="100%">
-            <TemperatureSlider 
-                temperature={ temperature } 
-                onChange={ handleColorChange }
-            />
-            <BrightnessSlider 
-                brightness={ brightness } 
-                onChange={ handleColorChange }
-            />
+            <SliderMode/>
         </Box>
     )
 }

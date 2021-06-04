@@ -1,12 +1,14 @@
-import React, {useState, useCallback} from 'react'
+import React, {useCallback} from 'react'
 import ColorSlider from './ColorSlider'
  
 export default function TemperatureSlider ({ temperature, onChange }) {
-    const [temp, setTemperature] = useState(temperature)
 
     const handleTemperatureChange = useCallback(value => {
-        setTemperature(value)
-        onChange('temp', value)
+        const temp = {
+            temp: value
+        }
+
+        onChange('temp', temp)
     }, [onChange]);
 
     return (
@@ -14,7 +16,7 @@ export default function TemperatureSlider ({ temperature, onChange }) {
             <ColorSlider 
                 min={1700} 
                 max={6500} 
-                defaultValue={ temp } 
+                defaultValue={ temperature } 
                 onChange={ (event) => handleTemperatureChange(event) } 
                 label='Temperature'/>
         </>

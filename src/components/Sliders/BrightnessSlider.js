@@ -1,19 +1,21 @@
-import React, {useState, useCallback} from 'react'
+import React, {useCallback} from 'react'
 import ColorSlider from './ColorSlider'
  
 export default function BrightnessSlider ({ brightness, onChange }) {
-    const [bright, setValue] = useState(brightness)
 
     const handleValueChange = useCallback(value => {
-        setValue(value)
-        onChange('bright', value)
+        const bright = {
+            bright: value
+        }
+        
+        onChange('bright', bright)
     }, [onChange]);
 
     return (
         <ColorSlider 
             min={1} 
             max={100} 
-            defaultValue={ bright } 
+            defaultValue={ brightness } 
             onChange={ (event) => handleValueChange(event) } 
             label='Brightness'
         />

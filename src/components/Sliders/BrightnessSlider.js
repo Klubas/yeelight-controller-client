@@ -13,7 +13,7 @@ export default function BrightnessSlider ({ brightness, onChange }) {
 
     return (
         <ColorSlider 
-            min={1} 
+            min={2} 
             max={100} 
             defaultValue={ brightness } 
             onChange={ (event) => handleValueChange(event) } 

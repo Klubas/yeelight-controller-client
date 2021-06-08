@@ -27,7 +27,7 @@ export const setLayout = () => {
 
         if (width <= 480 && height <= 320) {
             layout = 'minimal'
-            disableElementSelection()
+            //disableElementSelection()
         } else {
             layout = 'full'
         }
@@ -55,25 +55,21 @@ export const validateLocalNetwork = () => {
 }
 
 /** Color functions */
+const tinycolor = require("tinycolor2")
+
 export const colorToRgb = (color) => {
-    let tinycolor = require("tinycolor2")
     color = tinycolor(color)
     return color.toRgb()
 }
 
-export const colorToHex = (color, str=true) => {
-    let tinycolor = require("tinycolor2")
+export const colorToHsv = (color) => {
     color = tinycolor(color)
-    /*
-    console.log('Brightness: ' + color.getBrightness())
-    console.log('IsDark: ' + color.isDark())
-    console.log('IsLight: ' + color.isLight())
-    console.log('Luminance: ' + color.getLuminance())
-    */
-    if (str) {
-        return color.toHexString()
-    }
-    return color.toHex()
+    return color.toHsv()
+}
+
+export const colorToHex = (color) => {
+    color = tinycolor(color)
+    return color.toHexString()
 }
 
 export const kelvinToHex = (kelvin) => {

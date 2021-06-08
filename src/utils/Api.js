@@ -75,13 +75,12 @@ export const login = (username, password) => {
 }
 
 export const getAllBulbs = () => {
-    let fake_bulbs = (
-        process.env.REACT_APP_FAKE_BULBS ? '?fake_bulbs=' + process.env.REACT_APP_FAKE_BULBS  : '')
+    let fake_bulbs = (process.env.REACT_APP_FAKE_BULBS ? '?fake_bulbs=' + process.env.REACT_APP_FAKE_BULBS  : '')
     return callEndpoint('GET', '/api/bulbs' + fake_bulbs)
 }
 
-export const getBulb = (ip, id) => {
-    return callEndpoint('GET', '/api/bulb?ip=' + ip + '&id=' + id)
+export const getBulb = (ip) => {
+    return callEndpoint('GET', '/api/bulb?ip=' + ip)
 }
 
 export const changeLampState = (ip, state, id) => {

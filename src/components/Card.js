@@ -4,13 +4,15 @@ import {
     Box, 
     Flex, 
     Skeleton,
+    useToast
 } from "@chakra-ui/react"
 
 import Bulb from './Bulb'
 import ColorChanger from './ColorChanger'
 import BulbDescription from './BulbDescription'
 
-import { kelvinToHex, colorToHex } from '../utils/scripts'
+import { getBulb } from '../utils/Api'
+import { kelvinToHex, colorToHex, colorToHsv } from '../utils/scripts'
 
 export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight}) {
     const [ip, ] = useState(bulbIP)
@@ -21,7 +23,32 @@ export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColo
     const [isLoading, ] = useState(false)
     const [, setHexColor] = useState()
     const [colors, setColors] = useState(() => getBulbColors())
+    const toast = useToast()
 
+    const fetchBulb = async (ip) => {
+
+        try {
+            let response = await getBulb(ip)
+            response = response.response
+            if (response.length > 0) {
+                console.log(response)
+            } else {
+                throw new Error('No bulb data found!')
+            }
+
+        } catch (error) {
+            toast({
+                title: "Something went wrong!",
+                description: error.message,
+                status: "error",
+                duration: 1500,
+                isClosable: true,
+            })
+            console.log(error)
+        }
+
+    }
+  
     function getBulbColors(){
         
         const hexColor = () => {
@@ -53,9 +80,11 @@ export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColo
                 obj.hex = colorToHex(obj.hsv)
             break;
             case 'bright':
+                const aux_hsv  = colorToHsv(obj.hex)
+                aux_hsv.v = values.bright
+                obj.hex = colorToHex(aux_hsv)
                 obj.hsv.v = values.bright
                 obj.bright = values.bright
-                obj.hex = colorToHex(obj.hsv)
             break;
             case 'temp':
                 obj.temp = values.temp
@@ -72,12 +101,15 @@ export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColo
         <Box width="full" onDoubleClick={() => setColorPicker(false) }>
             <ColorChanger 
                 bulbIP={ ip } 
-                bulbHSV = { colors.hsv } 
                 bulbCt={ colors.temp } 
-                bulbRGB={ colors.rgb }
-                bulbBrightness = { colors.bright }
                 onChange={ setBulbColors }
-                colorMode={ 'hsv' }
+                colorMode={ 'temp' }
+            />
+            <ColorChanger 
+                bulbIP={ ip } 
+                bulbBrightness={ colors.bright } 
+                onChange={ setBulbColors }
+                colorMode={ 'bright' }
             />
         </Box>
     )

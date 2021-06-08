@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import { 
     Box, 
@@ -23,39 +23,37 @@ export default function CardList ({ loadData, appLayout }) {
     const cardWidth = (layout === 'minimal' ? dimensions.width - 30 : "330px")
     const toast = useToast()
 
-    useEffect(() => {
-        
-        const fetchData = async () => {
+    const fetchData = useCallback(async () => {
             
-            try {
-                let response = await getAllBulbs()
-                response = response.response
-                if (response.length > 0) {
-                    setSkelCount(response.length)
-                    setError('')
-                    setCardData(response)
-                } else {
-                    throw new Error('No bulbs found!')
-                }
-
-            } catch (error) {
-                toast({
-                    title: "Something went wrong!",
-                    description: error.message,
-                    status: "error",
-                    duration: 1500,
-                    isClosable: true,
-                })
-                console.log(error)
-                setError(error.message)
-                setSkelCount()
-                setCardData([])
+        try {
+            let response = await getAllBulbs()
+            response = response.response
+            if (response.length > 0) {
+                setSkelCount(response.length)
+                setError('')
+                setCardData(response)
+            } else {
+                throw new Error('No bulbs found!')
             }
+
+        } catch (error) {
+            toast({
+                title: "Something went wrong!",
+                description: error.message,
+                status: "error",
+                duration: 1500,
+                isClosable: true,
+            })
+            console.log(error)
+            setError(error.message)
+            setSkelCount()
+            setCardData([])
         }
-
-        fetchData()
-
     }, [toast])
+
+    useEffect(() => {
+        fetchData()
+    }, [toast, fetchData])
 
     const LoadError = () => (
         <Box 
@@ -71,7 +69,7 @@ export default function CardList ({ loadData, appLayout }) {
 
     const Loading = () => {
         let skels = []
-        for(let skel = 0; skel <= skelCount + 1; skel++) skels.push(skel)
+        for(let skel = 0; skel <= skelCount; skel++) skels.push(skel)
         return (<>
             {skels.map((i) =>
                 <Box key={i} maxWidth="100%">
@@ -89,7 +87,7 @@ export default function CardList ({ loadData, appLayout }) {
     }
             
     const Bulbs = () => (<>
-        { ! cardData.length ? <Loading/> : cardData.map((item) => 
+        { cardData.length ? cardData.map((item) => 
             <Box key={item.id} maxWidth="100%">
                 <Card 
                     bulbId={item.id}
@@ -115,7 +113,8 @@ export default function CardList ({ loadData, appLayout }) {
                     cardWidth={cardWidth}
                 />
             </Box>
-        )}
+        ) : <Loading/>
+        }
     </>)
 
     return (<>

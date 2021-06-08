@@ -32,6 +32,7 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 
-process.env.NODE_ENV === 'production' 
+
+process.env.NODE_ENV === 'production' && process.env.REACT_APP_DEBUG !== 'true'
   ? serviceWorker.register() 
   : serviceWorker.unregister()

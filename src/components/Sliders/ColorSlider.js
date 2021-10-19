@@ -20,13 +20,12 @@ export default function ColorSlider ({min, max, defaultValue, onChange, label}) 
                 min={ min }
                 max={ max }
                 onChangeEnd={ onChange } 
+                size="lg"
             >
                 <SliderTrack>
-                    <SliderFilledTrack  />
+                    <SliderFilledTrack color="red" />
                 </SliderTrack>
-                <SliderThumb>
-                    <Box />
-                </SliderThumb>
+                <SliderThumb/>
             </Slider>
         </Box>
     )

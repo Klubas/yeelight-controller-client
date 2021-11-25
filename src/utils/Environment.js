@@ -26,23 +26,25 @@ class Environment {
         }
         window.localStorage.setItem('layout', layout)
     }
-
+    
     validateLocalNetwork() {
+        
         const local_token = process.env.REACT_APP_LOCAL_TOKEN
+        
+        const isLocalhost = Boolean(
+            window.location.hostname === 'localhost' ||
+              // [::1] is the IPv6 localhost address.
+              window.location.hostname === '[::1]' ||
+              // 127.0.0.0/8 are considered localhost for IPv4.
+              window.location.hostname.match(
+                /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+              )
+          );
 
-        if (local_token) {
-            let url = window.location.href
-            url = url.split('/')
-            url = url[2].split(':')
-            url = url[0]
-
-            url = url === 'localhost' ? '127.0.0.1' : url
-            url = url.split('.')
-            url = url[0]
-
-            if (url === '192' || url === '127') {
-                window.localStorage.setItem('access_token', local_token)
-            }
+        if (local_token && isLocalhost) {
+            
+            window.localStorage.setItem('access_token', local_token)
+            
         }
     }
 
@@ -61,5 +63,7 @@ class Environment {
         }
     }
 }
+
+
 
 export var client_env = new Environment()

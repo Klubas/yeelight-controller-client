@@ -31,10 +31,11 @@ const callEndpoint = async (method, endpoint, data = null, auth = 'Bearer') => {
     }
 
     let response
+
     await fetch(url, settings)
-        .then(response => validateResponse(response))
-        .then(jsonData => response = jsonData.message)
-    
+        .then(response => response.json())
+        .then(jsonData => response = jsonData.message)    
+   
     try {
         switch (response.status) {
             case 'SUCCESS':
@@ -43,30 +44,19 @@ const callEndpoint = async (method, endpoint, data = null, auth = 'Bearer') => {
                 window.localStorage.setItem('access_token', response.response)
                 basic_login = null
                 return response.description
+            case 'LOGIN_ERROR':
+                window.localStorage.removeItem('access_token')
+                throw new Error(response.description)
+            case 'ERROR':
+                throw new Error('Unexpected error: ' + response.description)
             default:
-                throw new Error (response.description)
+                console.log(response)
+                throw new Error(response.response)
         }
     } catch (error) {
         console.log(error)
-        throw new Error('Unexpected error')
+        throw new Error(error)
     }    
-}
-
-const validateResponse = (response) => {
-    const [status, statusText] = [response.status, response.statusText]
-    try {
-        if (response && response.status !== 401) {
-            return response.json()
-        } else if (status === 401) {
-            window.localStorage.removeItem('access_token')
-            throw new Error('Invalid credentials')
-        } else {
-            throw new Error('Unexpected error ' + statusText)
-        }
-    } catch (error) {
-        console.log(error)
-        throw new Error(error.message)
-    }
 }
 
 export const login = (username, password) => {
@@ -75,7 +65,7 @@ export const login = (username, password) => {
 }
 
 export const getAllBulbs = () => {
-    let fake_bulbs = (process.env.REACT_APP_FAKE_BULBS ? '?fake_bulbs=' + process.env.REACT_APP_FAKE_BULBS  : '')
+    let fake_bulbs = (process.env.REACT_APP_FAKE_BULBS > 0 ? '?fake_bulbs=' + process.env.REACT_APP_FAKE_BULBS  : '')
     return callEndpoint('GET', '/api/bulbs' + fake_bulbs)
 }
 
@@ -83,12 +73,13 @@ export const getBulb = (id) => {
     return callEndpoint('GET', '/api/bulb?id=' + id)
 }
 
-export const changeLampState = (ip, state, id) => {
-    return callEndpoint('POST', '/api/bulb/power?ip=' + ip + '&state=' + state)
+export const changeLampState = (id, state) => {
+    return callEndpoint('POST', '/api/bulb/power?id=' + id + '&state=' + state)
 }
 
-export const changeLampColor = (ip, mode, values) => {
-    return callEndpoint('POST', '/api/bulb/color?ip=' + ip + '&mode=' + mode + '&values=' + values)
+export const changeLampColor = (id, mode, values) => {
+    return callEndpoint('POST'
+    , '/api/bulb/color?id=' + id + '&mode=' + mode + '&values=' + values)
 }
 
 export const changeLampName = (id, newName) => {

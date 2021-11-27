@@ -10,6 +10,7 @@ import {
 import Bulb from './Bulb'
 import ColorChanger from './ColorChanger'
 import BulbDescription from './BulbDescription'
+import ErrorMessage from './ErrorMessage'
 
 import { getBulb } from '../utils/Api'
 import { kelvinToHex, colorToHex, colorToHsv } from '../utils/scripts'
@@ -22,11 +23,18 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     const [power, setPower] = useState(bulbPower === 'on' ? true : false)
     const [colorPicker, setColorPicker] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const [hexColor, setHexColor] = useState()
+    const [colorMode, setColorMode] = useState(window.localStorage.getItem('color_mode'))
+    const [hexColor, setHexColor] = useState(() => getHexColor())
     const [colors, setColors] = useState(() => getBulbColors())
+    const [bulbNotFound, setBulbNotFound] = useState(false)
+    const [error, setError] = useState()
     const toast = useToast()
 
-    const fetchBulb = async () => {
+    document.addEventListener("contextmenu", (event) => {
+        event.preventDefault()
+    });
+
+    const fetchBulb = async (id) => {
         setIsLoading(true)
         try {
             let response = await getBulb(id)
@@ -37,13 +45,19 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
                 setIP(response.ip)
                 setBulbName(response.name)
                 setModel(response.model)
-                
-                
+                setPower(response.power)
+                setColorMode(window.localStorage.getItem('color_mode'))
+                setColors(getBulbColors())
+                setHexColor(getHexColor())
+                setColorPicker(false)
             } else {
-                throw new Error('No bulb data found!')
+                setBulbNotFound(true)
+                setError('No bulb data found!')
             }
 
         } catch (error) {
+            setBulbNotFound(true)
+            setError('Bulb not found.')
             toast({
                 title: "Something went wrong!",
                 description: error.message,
@@ -56,22 +70,20 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
         setIsLoading(false)
 
     }
+
+    function getHexColor() {
+        switch (colorMode) {
+            case 'rgb': return(colorToHex(bulbColors.rgb))
+            case 'hsv': return(colorToHex(bulbColors.hsv))
+            case 'bright': return(colorToHex(bulbColors.hsv))
+            case 'temp': return(kelvinToHex(bulbColors.temp)) 
+            default: return(colorToHex(bulbColors.rgb))
+        }
+    }
   
     function getBulbColors(){
-        
-        const hexColor = () => {
-            let color_mode = window.localStorage.getItem('color_mode')
-            switch (color_mode) {
-                case 'rgb': return(colorToHex(bulbColors.rgb))
-                case 'hsv': return(colorToHex(bulbColors.hsv))
-                case 'bright': return(colorToHex(bulbColors.hsv))
-                case 'temp': return(kelvinToHex(bulbColors.temp)) 
-                default: return(colorToHex(bulbColors.rgb))
-            }
-        }
-
         let obj = bulbColors
-        obj.hex = hexColor()
+        obj.hex = getHexColor()
         return obj
     }
 
@@ -101,7 +113,8 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
             default:
                 throw new Error('Invalid value:' + color_mode)
         }
-        setHexColor(obj.hex) // This doesn't make sense, but without it the props bulbHexColor won't update until the next render
+        setColorMode(color_mode)
+        setHexColor(obj.hex) 
         setColors(obj)
     }
 
@@ -123,10 +136,9 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     )
     
     const BulbMetaData = () => (<>
-        <Box width="full" onDoubleClick={
-                () => setColorPicker(true)
-                //() => fetchBulb(ip)
-            }>
+        <Box width="full" 
+            onContextMenu={ () => fetchBulb(id) } 
+            onDoubleClick={ () => setColorPicker(true) }>
             <BulbDescription
                 bulbIP={ ip } 
                 bulbID={ id }
@@ -139,20 +151,22 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     
     return (
         <Skeleton isLoaded={!isLoading} borderRadius={8}>
-        <Flex 
-            align="left" 
-            p={5}
-            minWidth={cardWidth}
-            maxWidth={cardWidth}
-            minHeight={cardHeight}
-            maxHeight={cardHeight}
-            boxShadow="lg"
-        >
-        <Box width="full">
-            <Bulb bulbID={id} bulbPower={ power } bulbHexColor={ colors.hex }/>
-        </Box>
-            { colorPicker ? <BulbColorChanger/> : <BulbMetaData/>}
-        </Flex>
+        { bulbNotFound 
+            ?   <ErrorMessage message={ error }/> 
+            :   <Flex 
+                    align="left" 
+                    p={5}
+                    minWidth={cardWidth}
+                    maxWidth={cardWidth}
+                    minHeight={cardHeight}
+                    maxHeight={cardHeight}
+                    boxShadow="lg">
+                <Box width="full">
+                    <Bulb bulbID={id} bulbPower={ power } bulbHexColor={ hexColor }/>
+                </Box>
+                    { colorPicker ? <BulbColorChanger/> : <BulbMetaData/>}
+                </Flex>
+        }
         </Skeleton>
     )       
 }

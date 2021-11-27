@@ -69,7 +69,7 @@ export default function CardList ({ loadData, appLayout }) {
 
     const Loading = () => {
         let skels = []
-        for(let skel = 0; skel <= skelCount; skel++) skels.push(skel)
+        for(let skel = 1; skel <= skelCount; skel++) skels.push(skel)
         return (<>
             {skels.map((i) =>
                 <Box key={i} maxWidth="100%">
@@ -90,7 +90,7 @@ export default function CardList ({ loadData, appLayout }) {
         { cardData.length ? cardData.map((item) => 
             <Box key={item.id} maxWidth="100%">
                 <Card 
-                    bulbId={item.id}
+                    bulbID={item.id}
                     bulbIP={item.ip} 
                     bulbName={item.name}
                     bulbModel={item.model}

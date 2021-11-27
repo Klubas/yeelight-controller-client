@@ -14,21 +14,23 @@ import {
 
 import {changeLampName} from '../utils/Api'
 
-export default function BulbDescription ({ bulbIP, bulbName, bulbModel }){
+export default function BulbDescription ({ bulbID, bulbIP, bulbName, bulbModel, onChangeBulbName }){
+    const [id, ] = useState(bulbID)
     const [ip, ] = useState(bulbIP)
     const [name, setName] = useState(bulbName)
     const [newName, setNewName] = useState(bulbName)
     const [model, ] = useState(bulbModel)
     const toast = useToast()
     
-    const handleNameChange = async (event) => {
+    const handleNameChange = async () => {
         const currentName = name
         const changedName = newName
         
         try {
             if (changedName !== currentName) {
-                await changeLampName(ip, changedName)
+                await changeLampName(id, changedName)
                 setName(changedName)
+                onChangeBulbName(changedName)
             }
         } catch (error) {
             toast({

@@ -14,24 +14,31 @@ import BulbDescription from './BulbDescription'
 import { getBulb } from '../utils/Api'
 import { kelvinToHex, colorToHex, colorToHsv } from '../utils/scripts'
 
-export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight}) {
-    const [ip, ] = useState(bulbIP)
-    const [name, ] = useState(bulbName)
-    const [model, ] = useState(bulbModel)
-    const [power, ] = useState(bulbPower === 'on' ? true : false)
+export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight}) {
+    const [id, setID] = useState(bulbID)
+    const [ip, setIP] = useState(bulbIP)
+    const [name, setBulbName] = useState(bulbName)
+    const [model, setModel] = useState(bulbModel)
+    const [power, setPower] = useState(bulbPower === 'on' ? true : false)
     const [colorPicker, setColorPicker] = useState(false)
-    const [isLoading, ] = useState(false)
-    const [, setHexColor] = useState()
+    const [isLoading, setIsLoading] = useState(false)
+    const [hexColor, setHexColor] = useState()
     const [colors, setColors] = useState(() => getBulbColors())
     const toast = useToast()
 
-    const fetchBulb = async (ip) => {
-
+    const fetchBulb = async () => {
+        setIsLoading(true)
         try {
-            let response = await getBulb(ip)
+            let response = await getBulb(id)
             response = response.response
-            if (response.length > 0) {
+            if (response) {
                 console.log(response)
+                setID(response.id)
+                setIP(response.ip)
+                setBulbName(response.name)
+                setModel(response.model)
+                
+                
             } else {
                 throw new Error('No bulb data found!')
             }
@@ -46,6 +53,7 @@ export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColo
             })
             console.log(error)
         }
+        setIsLoading(false)
 
     }
   
@@ -115,8 +123,14 @@ export default function Card ({ bulbIP, bulbName, bulbModel, bulbPower, bulbColo
     )
     
     const BulbMetaData = () => (<>
-        <Box width="full" onDoubleClick={() => setColorPicker(true) }>
-            <BulbDescription bulbIP={ ip } bulbName={ name } bulbModel={ model }/>
+        <Box width="full" onDoubleClick={/*() => setColorPicker(true) */() => fetchBulb(ip)}>
+            <BulbDescription 
+                bulbID={ id }
+                bulbIP={ ip } 
+                bulbName={ name } 
+                bulbModel={ model } 
+                onChangeBulbName={ setBulbName }
+            />
         </Box>   
     </>)
     

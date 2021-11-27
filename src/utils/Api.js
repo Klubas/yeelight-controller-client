@@ -79,8 +79,8 @@ export const getAllBulbs = () => {
     return callEndpoint('GET', '/api/bulbs' + fake_bulbs)
 }
 
-export const getBulb = (ip) => {
-    return callEndpoint('GET', '/api/bulb?ip=' + ip)
+export const getBulb = (id) => {
+    return callEndpoint('GET', '/api/bulb?id=' + id)
 }
 
 export const changeLampState = (ip, state, id) => {
@@ -91,6 +91,6 @@ export const changeLampColor = (ip, mode, values) => {
     return callEndpoint('POST', '/api/bulb/color?ip=' + ip + '&mode=' + mode + '&values=' + values)
 }
 
-export const changeLampName = (ip, newName) => {
-    return callEndpoint('PUT', '/api/bulb?ip=' + ip + '&new_name=' + newName)
+export const changeLampName = (id, newName) => {
+    return callEndpoint('PUT', '/api/bulb?id=' + id + '&new_name=' + newName)
 }

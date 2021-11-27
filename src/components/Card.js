@@ -108,13 +108,13 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     const BulbColorChanger = () => (
         <Box width="full" onDoubleClick={() => setColorPicker(false) }>
             <ColorChanger 
-                bulbIP={ ip } 
+                bulbID={ id } 
                 bulbCt={ colors.temp } 
                 onChange={ setBulbColors }
                 colorMode={ 'temp' }
             />
             <ColorChanger 
-                bulbIP={ ip } 
+                bulbID={ id } 
                 bulbBrightness={ colors.bright } 
                 onChange={ setBulbColors }
                 colorMode={ 'bright' }
@@ -123,10 +123,13 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     )
     
     const BulbMetaData = () => (<>
-        <Box width="full" onDoubleClick={/*() => setColorPicker(true) */() => fetchBulb(ip)}>
-            <BulbDescription 
-                bulbID={ id }
+        <Box width="full" onDoubleClick={
+                () => setColorPicker(true)
+                //() => fetchBulb(ip)
+            }>
+            <BulbDescription
                 bulbIP={ ip } 
+                bulbID={ id }
                 bulbName={ name } 
                 bulbModel={ model } 
                 onChangeBulbName={ setBulbName }
@@ -146,7 +149,7 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
             boxShadow="lg"
         >
         <Box width="full">
-            <Bulb bulbIP={ip} bulbPower={ power } bulbHexColor={ colors.hex }/>
+            <Bulb bulbID={id} bulbPower={ power } bulbHexColor={ colors.hex }/>
         </Box>
             { colorPicker ? <BulbColorChanger/> : <BulbMetaData/>}
         </Flex>

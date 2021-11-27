@@ -8,15 +8,15 @@ import {
 
 import { changeLampState } from '../utils/Api'
 
-export default function Bulb ({ bulbIP, bulbPower, bulbHexColor }) {
-    const [ip, ] = useState(bulbIP)
+export default function Bulb ({ bulbID, bulbPower, bulbHexColor }) {
+    const [id, ] = useState(bulbID)
     const [power, setPower] = useState(bulbPower)
     const toast = useToast()
 
     const handleBulbClick = () => {
         const togglePower = async (state) => {
             try {
-                await changeLampState(ip, state)
+                await changeLampState(id, state)
                 setPower(state === 'on' ? true : false)
             }
             catch (error){

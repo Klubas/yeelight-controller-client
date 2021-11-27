@@ -12,8 +12,8 @@ import BrightnessSlider from './Sliders/BrightnessSlider'
 
 import {changeLampColor} from '../utils/Api'
 
-export default function ColorChanger ({ colorMode, bulbIP, bulbHSV, bulbRGB, bulbCt, bulbBrightness, onChange }) {
-    const [ip, ] = useState(bulbIP)
+export default function ColorChanger ({ colorMode, bulbID, bulbHSV, bulbRGB, bulbCt, bulbBrightness, onChange }) {
+    const [id, ] = useState(bulbID)
     const [hsv, ] = useState(bulbHSV)
     const [rgb, ] = useState(bulbRGB)
     const [temperature, ] = useState(bulbCt)
@@ -24,7 +24,7 @@ export default function ColorChanger ({ colorMode, bulbIP, bulbHSV, bulbRGB, bul
     const handleColorChange = async (mode, values) => {
         
         try{
-            await changeLampColor(ip, mode, Object.values(values))
+            await changeLampColor(id, mode, Object.values(values))
             onChange(mode, values)
             window.localStorage.setItem('color_mode', mode)
         } catch (error) {

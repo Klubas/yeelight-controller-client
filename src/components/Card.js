@@ -16,16 +16,16 @@ import { getBulb } from '../utils/Api'
 import { kelvinToHex, colorToHex, colorToHsv } from '../utils/scripts'
 
 export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight, bulbColorMode}) {
-    const [id, setID] = useState(bulbID)
+    const [id, ] = useState(bulbID)
     const [ip, setIP] = useState(bulbIP)
     const [name, setBulbName] = useState(bulbName)
-    const [model, setModel] = useState(bulbModel)
+    const [model, ] = useState(bulbModel)
     const [power, setPower] = useState(bulbPower === 'on' ? true : false)
     const [colorPicker, setColorPicker] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [colors, setColors] = useState(bulbColors)
     const [colorMode, setColorMode] = useState(bulbColorMode)
     const [hexColor, setHexColor] = useState(() => getHexColor())
-    const [colors, setColors] = useState(() => getBulbColors())
     const [bulbNotFound, setBulbNotFound] = useState(false)
     const [error, setError] = useState()
     const toast = useToast()
@@ -40,16 +40,41 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
             let response = await getBulb(id)
             response = response.response
             if (response) {
-                console.log(response)
-                setID(response.id)
+                //console.log(response)
+
+                let newColorMode = response.cached_properties.color_mode
+                let newColors = {
+                    rgb: { 
+                        r: Math.floor(response.rgb / (256*256)),
+                        g: Math.floor(response.rgb / 256) % 256,
+                        b: response.rgb % 256 
+                    }, // convert decimal color to rgb values
+                    hsv: {
+                        h: response.hue,
+                        s: response.sat,
+                        v: response.bright
+                    },
+                    bright: response.current_brightness,
+                    temp: response.ct
+                }
+
                 setIP(response.ip)
+                setPower(response.power === 'on' ? true : false)
                 setBulbName(response.name)
-                setModel(response.model)
-                setPower(response.power)
-                setColorMode(window.localStorage.getItem('color_mode'))
-                setColors(getBulbColors())
-                setHexColor(getHexColor())
-                setColorPicker(false)
+                setColorMode(newColorMode)
+                setColors(newColors)
+                
+                let newHexColor
+                switch (newColorMode) {
+                    case 'rgb':     newHexColor = colorToHex(colors.rgb);   break;
+                    case 'hsv':     newHexColor = colorToHex(colors.hsv);   break;
+                    case 'bright':  newHexColor = colorToHex(colors.hsv);   break;
+                    case 'temp':    newHexColor = kelvinToHex(colors.temp); break;
+                    default:        newHexColor = colorToHex(colors.rgb);   break;
+                }
+
+                setHexColor(newHexColor)
+                //setBulbColors(newColorMode, values)
             } else {
                 setBulbNotFound(true)
                 setError('No bulb data found!')
@@ -73,11 +98,11 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
 
     function getHexColor() {
         switch (colorMode) {
-            case 'rgb': return(colorToHex(bulbColors.rgb))
-            case 'hsv': return(colorToHex(bulbColors.hsv))
-            case 'bright': return(colorToHex(bulbColors.hsv))
-            case 'temp': return(kelvinToHex(bulbColors.temp)) 
-            default: return(colorToHex(bulbColors.rgb))
+            case 'rgb': return(colorToHex(colors.rgb))
+            case 'hsv': return(colorToHex(colors.hsv))
+            case 'bright': return(colorToHex(colors.hsv))
+            case 'temp': return(kelvinToHex(colors.temp)) 
+            default: return(colorToHex(colors.rgb))
         }
     }
   
@@ -162,7 +187,7 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
                     maxHeight={cardHeight}
                     boxShadow="lg">
                 <Box width="full">
-                    <Bulb bulbID={id} bulbPower={ power } bulbHexColor={ hexColor }/>
+                    <Bulb bulbID={id} bulbPower={ power } bulbHexColor={ hexColor } onChangeBulbState={ setPower }/>
                 </Box>
                     { colorPicker ? <BulbColorChanger/> : <BulbMetaData/>}
                 </Flex>

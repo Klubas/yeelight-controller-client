@@ -8,7 +8,7 @@ import {
 
 import { changeLampState } from '../utils/Api'
 
-export default function Bulb ({ bulbID, bulbPower, bulbHexColor }) {
+export default function Bulb ({ bulbID, bulbPower, bulbHexColor, onChangeBulbState }) {
     const [id, ] = useState(bulbID)
     const [power, setPower] = useState(bulbPower)
     const toast = useToast()
@@ -32,6 +32,7 @@ export default function Bulb ({ bulbID, bulbPower, bulbHexColor }) {
             }
         }
         power ? togglePower('off') : togglePower('on')
+        onChangeBulbState(power)
     }
 
     const BulbIcon = () => (

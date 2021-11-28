@@ -94,20 +94,21 @@ export default function CardList ({ loadData, appLayout }) {
                     bulbIP={item.ip} 
                     bulbName={item.name}
                     bulbModel={item.model}
-                    bulbPower={item.properties.power}
+                    bulbPower={item.power}
+                    bulbColorMode={item.cached_properties.color_mode}
                     bulbColors={{
                         rgb: { 
-                            r: Math.floor(item.properties.rgb / (256*256)),
-                            g: Math.floor(item.properties.rgb / 256) % 256,
-                            b: item.properties.rgb % 256 
+                            r: Math.floor(item.rgb / (256*256)),
+                            g: Math.floor(item.rgb / 256) % 256,
+                            b: item.rgb % 256 
                         }, // convert decimal color to rgb values
                         hsv: {
-                            h: item.properties.hue,
-                            s: item.properties.sat,
-                            v: item.properties.bright
+                            h: item.hue,
+                            s: item.sat,
+                            v: item.bright
                         },
-                        bright: item.properties.current_brightness,
-                        temp: item.properties.ct
+                        bright: item.current_brightness,
+                        temp: item.ct
                     }}
                     cardHeight={cardHeight}
                     cardWidth={cardWidth}

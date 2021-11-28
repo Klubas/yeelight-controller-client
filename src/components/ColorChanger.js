@@ -26,7 +26,6 @@ export default function ColorChanger ({ colorMode, bulbID, bulbHSV, bulbRGB, bul
         try{
             await changeLampColor(id, mode, Object.values(values))
             onChange(mode, values)
-            window.localStorage.setItem('color_mode', mode)
         } catch (error) {
             toast({
                 title: "Something went wrong!",

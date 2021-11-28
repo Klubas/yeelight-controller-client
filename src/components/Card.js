@@ -15,7 +15,7 @@ import ErrorMessage from './ErrorMessage'
 import { getBulb } from '../utils/Api'
 import { kelvinToHex, colorToHex, colorToHsv } from '../utils/scripts'
 
-export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight}) {
+export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight, bulbColorMode}) {
     const [id, setID] = useState(bulbID)
     const [ip, setIP] = useState(bulbIP)
     const [name, setBulbName] = useState(bulbName)
@@ -23,7 +23,7 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     const [power, setPower] = useState(bulbPower === 'on' ? true : false)
     const [colorPicker, setColorPicker] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const [colorMode, setColorMode] = useState(window.localStorage.getItem('color_mode'))
+    const [colorMode, setColorMode] = useState(bulbColorMode)
     const [hexColor, setHexColor] = useState(() => getHexColor())
     const [colors, setColors] = useState(() => getBulbColors())
     const [bulbNotFound, setBulbNotFound] = useState(false)

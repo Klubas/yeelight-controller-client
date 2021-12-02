@@ -111,6 +111,7 @@ export default function CardList ({ loadData, appLayout }) {
                         bright: item.current_brightness,
                         temp: item.ct
                     }}
+                    bulbIsOnline={item.cached_properties.online}
                     cardHeight={cardHeight}
                     cardWidth={cardWidth}
                 />

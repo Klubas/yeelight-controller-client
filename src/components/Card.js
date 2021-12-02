@@ -21,7 +21,7 @@ import ErrorMessage from './ErrorMessage'
 import { getBulb } from '../utils/Api'
 import { kelvinToHex, colorToHex, colorToHsv } from '../utils/scripts'
 
-export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight, bulbColorMode}) {
+export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight, bulbColorMode, bulbIsOnline}) {
     const [id, ] = useState(bulbID)
     const [ip, setIP] = useState(bulbIP)
     const [name, setBulbName] = useState(bulbName)
@@ -33,6 +33,7 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     const [colorMode, setColorMode] = useState(bulbColorMode)
     const [hexColor, setHexColor] = useState(() => getHexColor())
     const [bulbNotFound, setBulbNotFound] = useState(false)
+    const [isOnline, setIsOnline] = useState(bulbIsOnline)
     const [error, setError] = useState()
     const toast = useToast()
     const colorModes = ['rgb', 'hsv', 'bright', 'temp']
@@ -69,6 +70,7 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
                 setBulbName(response.name)
                 setColorMode(newColorMode)
                 setColors(newColors)
+                setIsOnline(response.cached_properties.online)
                 setShowColorChanger(false)
                 
                 let newHexColor
@@ -201,13 +203,14 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     
     const BulbMetaData = () => (<>
         <Box width="full" 
-            onDoubleClick={ () => setShowColorChanger(true) }
+            onDoubleClick={ isOnline ? () => setShowColorChanger(true) : null }
             marginLeft="10">
             <BulbDescription
                 bulbIP={ ip } 
                 bulbID={ id }
                 bulbName={ name } 
                 bulbModel={ model } 
+                bulbIsOnline={ isOnline }
                 onChangeBulbName={ setBulbName }
             />
         </Box>   

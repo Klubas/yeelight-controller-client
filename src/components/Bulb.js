@@ -8,9 +8,10 @@ import {
 
 import { changeLampState } from '../utils/Api'
 
-export default function Bulb ({ bulbID, bulbPower, bulbHexColor, onChangeBulbState }) {
+export default function Bulb ({ bulbID, bulbPower, bulbHexColor, bulbIsOnline, onChangeBulbState }) {
     const [id, ] = useState(bulbID)
     const [power, setPower] = useState(bulbPower)
+    const [isOnline, ] = useState(bulbIsOnline)
     const toast = useToast()
 
     const handleBulbClick = () => {
@@ -46,7 +47,8 @@ export default function Bulb ({ bulbID, bulbPower, bulbHexColor, onChangeBulbSta
     
     return (
         <LightMode>
-            <Box width="45%" alignContent="right" size="80%" maxWidth="80%" onClick={ handleBulbClick }>
+            <Box width="45%" alignContent="right" size="80%" maxWidth="80%" 
+                onClick={ isOnline ? null : handleBulbClick }>
                 <BulbIcon/>
             </Box>
         </LightMode>

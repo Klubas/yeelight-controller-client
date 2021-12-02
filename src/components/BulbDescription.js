@@ -14,12 +14,13 @@ import {
 
 import {changeLampName} from '../utils/Api'
 
-export default function BulbDescription ({ bulbID, bulbIP, bulbName, bulbModel, onChangeBulbName }){
+export default function BulbDescription ({ bulbID, bulbIP, bulbName, bulbModel, bulbIsOnline, onChangeBulbName }){
     const [id, ] = useState(bulbID)
     const [ip, ] = useState(bulbIP)
     const [name, setName] = useState(bulbName)
     const [newName, setNewName] = useState(bulbName)
     const [model, ] = useState(bulbModel)
+    const [isOnline, ] = useState(bulbIsOnline)
     const toast = useToast()
     
     const handleNameChange = async () => {
@@ -47,7 +48,7 @@ export default function BulbDescription ({ bulbID, bulbIP, bulbName, bulbModel, 
 
     return (<>
         <Box width="100%" textAlign="right" ml="1" color="gray.600" fontSize="sm" pb="15px" onClick={ null }>
-            <Text verticalAlign="text-top" fontSize="xs" >{ip}</Text>
+            <Text verticalAlign="text-top" fontSize="xs"><strong>{ isOnline ? ip : 'Offline' }</strong></Text>
         </Box>
         <Flex textAlign="left" verticalAlign="center">
             <Heading>
@@ -60,7 +61,7 @@ export default function BulbDescription ({ bulbID, bulbIP, bulbName, bulbModel, 
                     onSubmit={ handleNameChange }
                     onChange={eventValue => setNewName(eventValue)}
                     isTruncated
-                    isDisabled={ false }>
+                    isDisabled={ isOnline ? false : true }>
                     <EditablePreview />
                     <EditableInput />
                 </Editable>

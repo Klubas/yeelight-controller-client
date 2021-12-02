@@ -77,7 +77,7 @@ export default function ColorChanger ({ colorMode, bulbID, bulbHSV, bulbRGB, bul
     }
 
     return(
-        <Box width="100%" >
+        <Box width="full" height="full" >
             <SliderMode/>
         </Box>
     )

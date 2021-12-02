@@ -1,11 +1,17 @@
 import React, {useState} from 'react'
 
 import { 
-    Box, 
+    Box,  
     Flex, 
+    IconButton, 
     Skeleton,
     useToast
 } from "@chakra-ui/react"
+
+import { 
+    ChevronRightIcon,
+    ChevronLeftIcon
+} from '@chakra-ui/icons'
 
 import Bulb from './Bulb'
 import ColorChanger from './ColorChanger'
@@ -21,7 +27,7 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     const [name, setBulbName] = useState(bulbName)
     const [model, ] = useState(bulbModel)
     const [power, setPower] = useState(bulbPower === 'on' ? true : false)
-    const [colorPicker, setColorPicker] = useState(false)
+    const [showColorChanger, setShowColorChanger] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [colors, setColors] = useState(bulbColors)
     const [colorMode, setColorMode] = useState(bulbColorMode)
@@ -29,6 +35,7 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
     const [bulbNotFound, setBulbNotFound] = useState(false)
     const [error, setError] = useState()
     const toast = useToast()
+    const colorModes = ['rgb', 'hsv', 'bright', 'temp']
 
     document.addEventListener("contextmenu", (event) => {
         event.preventDefault()
@@ -40,7 +47,6 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
             let response = await getBulb(id)
             response = response.response
             if (response) {
-                //console.log(response)
 
                 let newColorMode = response.cached_properties.color_mode
                 let newColors = {
@@ -63,6 +69,7 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
                 setBulbName(response.name)
                 setColorMode(newColorMode)
                 setColors(newColors)
+                setShowColorChanger(false)
                 
                 let newHexColor
                 switch (newColorMode) {
@@ -143,27 +150,59 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
         setColors(obj)
     }
 
-    const BulbColorChanger = () => (
-        <Box width="full" onDoubleClick={() => setColorPicker(false) }>
-            <ColorChanger 
-                bulbID={ id } 
-                bulbCt={ colors.temp } 
-                onChange={ setBulbColors }
-                colorMode={ 'temp' }
+    const nextColorMode = () => {
+        let index = colorModes.indexOf(colorMode)
+        index = index + 1
+        if (index === 4) index = 0
+        setColorMode(colorModes[index])
+    }
+
+    const previousColorMode = () => {
+        let index = colorModes.indexOf(colorMode)
+        index = index - 1
+        if (index < 0) index = 3
+        setColorMode(colorModes[index])
+    }
+
+    const BulbColorChanger = () => (        
+        <Flex width='full' onDoubleClick={() => setShowColorChanger(false) } >
+            <IconButton 
+                aria-label="previous color mode" 
+                icon={ <ChevronLeftIcon/> } 
+                onClick={ previousColorMode }
+                variant='outline'
+                size='sm'
+                border='false'
+                height='full'
+                width='min'
             />
-            <ColorChanger 
+            <ColorChanger
+                width='full'
                 bulbID={ id } 
-                bulbBrightness={ colors.bright } 
+                bulbCt={ colors.temp }
+                bulbBrightness={ colors.bright }
+                bulbHSV={ colors.hsv }
+                bulbRGB={ colors.rgb }
                 onChange={ setBulbColors }
-                colorMode={ 'bright' }
+                colorMode={ colorMode }
             />
-        </Box>
+            <IconButton 
+                aria-label="next color mode" 
+                icon={ <ChevronRightIcon/> } 
+                onClick={ nextColorMode }
+                variant='outline'
+                size='sm'
+                border='false'
+                height='full'
+                width='min'
+            />
+        </Flex>
     )
     
     const BulbMetaData = () => (<>
         <Box width="full" 
-            onContextMenu={ () => fetchBulb(id) } 
-            onDoubleClick={ () => setColorPicker(true) }>
+            onDoubleClick={ () => setShowColorChanger(true) }
+            marginLeft="10">
             <BulbDescription
                 bulbIP={ ip } 
                 bulbID={ id }
@@ -185,11 +224,20 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
                     maxWidth={cardWidth}
                     minHeight={cardHeight}
                     maxHeight={cardHeight}
-                    boxShadow="lg">
-                <Box width="full">
-                    <Bulb bulbID={id} bulbPower={ power } bulbHexColor={ hexColor } onChangeBulbState={ setPower }/>
+                    boxShadow="lg"
+                    onContextMenu={ () => fetchBulb(id) } >        
+                <Box>
+                    <Bulb 
+                        bulbID={ id } 
+                        bulbPower={ power } 
+                        bulbHexColor={ hexColor } 
+                        onChangeBulbState={ setPower }
+                    />
                 </Box>
-                    { colorPicker ? <BulbColorChanger/> : <BulbMetaData/>}
+                    { showColorChanger 
+                        ? <BulbColorChanger/> 
+                        : <BulbMetaData/>
+                    }
                 </Flex>
         }
         </Skeleton>

@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 
 import { 
     Box, 
-    Grid,
+    Wrap,
+    WrapItem,
     Skeleton,
     useToast
 } from "@chakra-ui/react"
@@ -88,7 +89,7 @@ export default function CardList ({ loadData, appLayout }) {
             
     const Bulbs = () => (<>
         { cardData.length ? cardData.map((item) => 
-            <Box key={item.id} maxWidth="100%">
+            <WrapItem key={item.id} maxWidth="100%">
                 <Card 
                     bulbID={item.id}
                     bulbIP={item.ip} 
@@ -113,14 +114,14 @@ export default function CardList ({ loadData, appLayout }) {
                     cardHeight={cardHeight}
                     cardWidth={cardWidth}
                 />
-            </Box>
+            </WrapItem>
         ) : <Loading/>
         }
     </>)
 
     return (<>
-        <Grid gap="6">
+        <Wrap gap="6">
             { ! error ? <Bulbs/> : <LoadError/> }
-        </Grid>
+        </Wrap>
     </>)
 }

@@ -32,8 +32,19 @@ export default function Bulb ({ bulbID, bulbPower, bulbHexColor, bulbIsOnline, o
                 console.log(error)
             }
         }
-        power ? togglePower('off') : togglePower('on')
-        onChangeBulbState(power)
+
+        if (!isOnline) {
+            toast({
+                title: "Ops!",
+                description: 'This bulb is offline.',
+                status: "error",
+                duration: 1500,
+                isClosable: true,
+            })
+        } else {
+            power ? togglePower('off') : togglePower('on')
+            onChangeBulbState(power)
+        }
     }
 
     const BulbIcon = () => (
@@ -48,7 +59,7 @@ export default function Bulb ({ bulbID, bulbPower, bulbHexColor, bulbIsOnline, o
     return (
         <LightMode>
             <Box width="45%" alignContent="right" size="80%" maxWidth="80%" 
-                onClick={ isOnline ? null : handleBulbClick }>
+                onClick={ handleBulbClick }>
                 <BulbIcon/>
             </Box>
         </LightMode>

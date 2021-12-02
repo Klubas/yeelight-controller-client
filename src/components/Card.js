@@ -234,6 +234,7 @@ export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, 
                         bulbID={ id } 
                         bulbPower={ power } 
                         bulbHexColor={ hexColor } 
+                        bulbIsOnline={ isOnline }
                         onChangeBulbState={ setPower }
                     />
                 </Box>

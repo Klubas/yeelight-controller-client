@@ -1,165 +1,249 @@
 import React, {useState} from 'react'
-import bulb_on from '../images/bulb_on.svg'
-import bulb_off from '../images/bulb_off.svg'
-import {api} from '../utils/Api'
-import {client_env} from '../utils/Environment'
 
 import { 
-    Image,
+    Box,  
     Flex, 
-    Box, 
-    Badge,
-    Text,
-    Editable,
-    EditableInput,
-    EditablePreview,
-    Heading, 
-    IconButton,
-    useToast, Skeleton
-} from "@chakra-ui/core"
+    IconButton, 
+    Skeleton,
+    useToast
+} from "@chakra-ui/react"
 
-export default function Card ({ bulbId, bulbIP, bulbName, bulbModel, bulbPower, bulbColor, cardWidth, cardHeight, appLayout}) {
-    const toast = useToast()
-    const [id, setId] = useState(bulbId)
+import { 
+    ChevronRightIcon,
+    ChevronLeftIcon
+} from '@chakra-ui/icons'
+
+import Bulb from './Bulb'
+import ColorChanger from './ColorChanger'
+import BulbDescription from './BulbDescription'
+import ErrorMessage from './ErrorMessage'
+
+import { getBulb } from '../utils/Api'
+import { kelvinToHex, colorToHex, colorToHsv } from '../utils/scripts'
+
+export default function Card ({ bulbID, bulbIP, bulbName, bulbModel, bulbPower, bulbColors, cardWidth, cardHeight, bulbColorMode, bulbIsOnline}) {
+    const [id, ] = useState(bulbID)
     const [ip, setIP] = useState(bulbIP)
-    const [name, setName] = useState(bulbName)
-    const [model, setModel] = useState(bulbModel)
+    const [name, setBulbName] = useState(bulbName)
+    const [model, ] = useState(bulbModel)
     const [power, setPower] = useState(bulbPower === 'on' ? true : false)
-    const [color, setColor] = useState(bulbColor)
-    const [icon, setIcon] = useState(bulbPower === 'on' ? bulb_on : bulb_off)
+    const [showColorChanger, setShowColorChanger] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const [newName, setNewName] = useState(bulbName)
-    const [layout, setLayout] = useState(appLayout)
-    const iconSize = "80%"
+    const [colors, setColors] = useState(bulbColors)
+    const [colorMode, setColorMode] = useState(bulbColorMode)
+    const [hexColor, setHexColor] = useState(() => getHexColor())
+    const [bulbNotFound, setBulbNotFound] = useState(false)
+    const [isOnline, setIsOnline] = useState(bulbIsOnline)
+    const [error, setError] = useState()
+    const toast = useToast()
+    const colorModes = ['rgb', 'hsv', 'bright', 'temp']
 
-    function toastError(errorMessage){
-        toast({
-            title: "Something went wrong!",
-            description: errorMessage,
-            status: "error",
-            duration: 1500,
-            isClosable: true,
-        })
-    }
+    document.addEventListener("contextmenu", (event) => {
+        event.preventDefault()
+    });
 
-    async function fetchData() {
-
+    const fetchBulb = async (id) => {
         setIsLoading(true)
-            
         try {
-            let response = await api.getBulb(ip, id)
+            let response = await getBulb(id)
             response = response.response
-            setId(response.id)
-            setIP(response.ip)
-            setName(response.name)
-            setModel(response.model)
-            setPower(response.properties.power)
-            setColor(response.properties.rgb)
-            setIcon(response.properties.power === 'on' ? bulb_on : bulb_off)
-            setNewName(response.name)
-            setIsLoading(false)
+            if (response) {
+
+                let newColorMode = response.cached_properties.color_mode
+                let newColors = {
+                    rgb: { 
+                        r: Math.floor(response.rgb / (256*256)),
+                        g: Math.floor(response.rgb / 256) % 256,
+                        b: response.rgb % 256 
+                    }, // convert decimal color to rgb values
+                    hsv: {
+                        h: response.hue,
+                        s: response.sat,
+                        v: response.bright
+                    },
+                    bright: response.current_brightness,
+                    temp: response.ct
+                }
+
+                setIP(response.ip)
+                setPower(response.power === 'on' ? true : false)
+                setBulbName(response.name)
+                setColorMode(newColorMode)
+                setColors(newColors)
+                setIsOnline(response.cached_properties.online)
+                setShowColorChanger(false)
+                
+                let newHexColor
+                switch (newColorMode) {
+                    case 'rgb':     newHexColor = colorToHex(colors.rgb);   break;
+                    case 'hsv':     newHexColor = colorToHex(colors.hsv);   break;
+                    case 'bright':  newHexColor = colorToHex(colors.hsv);   break;
+                    case 'temp':    newHexColor = kelvinToHex(colors.temp); break;
+                    default:        newHexColor = colorToHex(colors.rgb);   break;
+                }
+
+                setHexColor(newHexColor)
+                //setBulbColors(newColorMode, values)
+            } else {
+                setBulbNotFound(true)
+                setError('No bulb data found!')
+            }
 
         } catch (error) {
-            toastError(error.message)
-            setIsLoading(false)
+            setBulbNotFound(true)
+            setError('Bulb not found.')
+            toast({
+                title: "Something went wrong!",
+                description: error.message,
+                status: "error",
+                duration: 1500,
+                isClosable: true,
+            })
             console.log(error)
         }
+        setIsLoading(false)
+
     }
+
+    function getHexColor() {
+        switch (colorMode) {
+            case 'rgb': return(colorToHex(colors.rgb))
+            case 'hsv': return(colorToHex(colors.hsv))
+            case 'bright': return(colorToHex(colors.hsv))
+            case 'temp': return(kelvinToHex(colors.temp)) 
+            default: return(colorToHex(colors.rgb))
+        }
+    }
+  
+    function getBulbColors(){
+        let obj = bulbColors
+        obj.hex = getHexColor()
+        return obj
+    }
+
+    function setBulbColors (color_mode, values) {
+        let obj = colors
+        switch (color_mode) {
+            case 'rgb':
+                obj.rgb = values
+                obj.hex = colorToHex(obj.rgb)
+            break;
+            case 'hsv':
+                obj.hsv = values
+                obj.bright = values.v
+                obj.hex = colorToHex(obj.hsv)
+            break;
+            case 'bright':
+                const aux_hsv  = colorToHsv(obj.hex)
+                aux_hsv.v = values.bright
+                obj.hex = colorToHex(aux_hsv)
+                obj.hsv.v = values.bright
+                obj.bright = values.bright
+            break;
+            case 'temp':
+                obj.temp = values.temp
+                obj.hex = kelvinToHex(obj.temp)
+            break;
+            default:
+                throw new Error('Invalid value:' + color_mode)
+        }
+        setColorMode(color_mode)
+        setHexColor(obj.hex) 
+        setColors(obj)
+    }
+
+    const nextColorMode = () => {
+        let index = colorModes.indexOf(colorMode)
+        index = index + 1
+        if (index === 4) index = 0
+        setColorMode(colorModes[index])
+    }
+
+    const previousColorMode = () => {
+        let index = colorModes.indexOf(colorMode)
+        index = index - 1
+        if (index < 0) index = 3
+        setColorMode(colorModes[index])
+    }
+
+    const BulbColorChanger = () => (        
+        <Flex width='full' onDoubleClick={() => setShowColorChanger(false) } >
+            <IconButton 
+                aria-label="previous color mode" 
+                icon={ <ChevronLeftIcon/> } 
+                onClick={ previousColorMode }
+                variant='outline'
+                size='sm'
+                border='false'
+                height='full'
+                width='min'
+            />
+            <ColorChanger
+                width='full'
+                bulbID={ id } 
+                bulbCt={ colors.temp }
+                bulbBrightness={ colors.bright }
+                bulbHSV={ colors.hsv }
+                bulbRGB={ colors.rgb }
+                onChange={ setBulbColors }
+                colorMode={ colorMode }
+            />
+            <IconButton 
+                aria-label="next color mode" 
+                icon={ <ChevronRightIcon/> } 
+                onClick={ nextColorMode }
+                variant='outline'
+                size='sm'
+                border='false'
+                height='full'
+                width='min'
+            />
+        </Flex>
+    )
     
-    const handleBulbClick = () => {
-        const togglePower = async (state) => {
-            try {
-                await api.changeLampState(ip, state, id)
-                setPower(state === 'on' ? true : false)
-                setIcon(state === 'on' ? bulb_on : bulb_off)
-            }
-            catch (error){
-                setPower(power === 'on' ? true : false)
-                setIcon(power === 'on' ? bulb_on : bulb_off)
-                toastError(error.message)
-                console.log(error)
-            }
-        }
-        power ? togglePower('off') : togglePower('on')
-    }
-
-    const handleSubmit = async (event) => {
-        const currentName = name
-        const changedName = newName
-        try {
-            if (changedName !== currentName) {
-                await api.changeLampName(ip, changedName)
-                setName(changedName)
-                document.getElementById("root").focus()
-            }
-        } catch (error) {
-            toastError(error.message)
-            setNewName(currentName)
-            console.log(error)
-        }
-      }
-
+    const BulbMetaData = () => (<>
+        <Box width="full" 
+            onDoubleClick={ isOnline ? () => setShowColorChanger(true) : null }
+            marginLeft="10">
+            <BulbDescription
+                bulbIP={ ip } 
+                bulbID={ id }
+                bulbName={ name } 
+                bulbModel={ model } 
+                bulbIsOnline={ isOnline }
+                onChangeBulbName={ setBulbName }
+            />
+        </Box>   
+    </>)
+    
     return (
         <Skeleton isLoaded={!isLoading} borderRadius={8}>
-        <Flex 
-            align="left" 
-            p={5}
-            minWidth={cardWidth}
-            maxWidth={cardWidth}
-            minHeight={cardHeight}
-            maxHeight={cardHeight}
-            borderWidth={1}
-            borderRadius={8}
-            boxShadow="lg"
-        >
-            <Box width="full" alignContent="center">
-                <Image 
-                    src={icon} 
-                    alt="bulb_icon" 
-                    onClick={ handleBulbClick } 
-                    size={ iconSize }
-                    maxWidth={ iconSize }
-                />
-            </Box>
-            <Box width="full">
-                <Box width="100%" textAlign="right" ml="1" color="gray.600" fontSize="sm" pb="15px" onClick={ layout === 'minimal' ? fetchData : null }>
-                        <Text verticalAlign="text-top" fontSize="xs" > {ip} 
-                            <IconButton 
-                                icon="repeat" 
-                                variant="link" 
-                                verticalAlign="baseline" 
-                                size="xs"
-                                pb="2px"
-                                onClick={ fetchData }
-                            />
-                        </Text>
-                        
-                </Box>
+        { bulbNotFound 
+            ?   <ErrorMessage message={ error }/> 
+            :   <Flex 
+                    align="left" 
+                    p={5}
+                    minWidth={cardWidth}
+                    maxWidth={cardWidth}
+                    minHeight={cardHeight}
+                    maxHeight={cardHeight}
+                    boxShadow="lg"
+                    onContextMenu={ () => fetchBulb(id) } >        
                 <Box>
-                    <Flex textAlign="left" verticalAlign="center">
-                        <Heading>
-                            <Editable
-                                minWidth="150px"
-                                maxWidth={cardWidth - icon.width}
-                                value={ newName } 
-                                defaultValue={ newName }
-                                selectAllOnFocus={true}
-                                onSubmit={ handleSubmit }
-                                onChange={eventValue => setNewName(eventValue)}
-                                isTruncated
-                                isDisabled={ layout === 'minimal' ? true : false }
-                            >
-                                <EditablePreview />
-                                <EditableInput />
-                            </Editable>
-                        </Heading>
-                    </Flex>
-                    <Box textAlign="right" width="90%">
-                        <Badge verticalAlign="top" variantColor="yellow">{model}</Badge>
-                    </Box>
+                    <Bulb 
+                        bulbID={ id } 
+                        bulbPower={ power } 
+                        bulbHexColor={ hexColor } 
+                        bulbIsOnline={ isOnline }
+                        onChangeBulbState={ setPower }
+                    />
                 </Box>
-            </Box>
-        </Flex>
+                    { showColorChanger 
+                        ? <BulbColorChanger/> 
+                        : <BulbMetaData/>
+                    }
+                </Flex>
+        }
         </Skeleton>
     )       
 }
